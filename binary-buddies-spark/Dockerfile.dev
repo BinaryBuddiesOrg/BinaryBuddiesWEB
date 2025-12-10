@@ -1,0 +1,21 @@
+# Development Dockerfile
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+COPY bun.lockb ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose development port
+EXPOSE 6533
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

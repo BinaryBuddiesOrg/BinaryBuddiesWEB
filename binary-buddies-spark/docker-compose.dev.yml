@@ -1,0 +1,20 @@
+services:
+  binary-buddies-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: binary-buddies-dev
+    ports:
+      - "6533:6533"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+    networks:
+      - binary-buddies-dev-network
+
+networks:
+  binary-buddies-dev-network:
+    driver: bridge
