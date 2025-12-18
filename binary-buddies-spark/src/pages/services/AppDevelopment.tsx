@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Smartphone, 
-  Tablet, 
-  Phone, 
-  Zap, 
-  ShoppingCart, 
+import {
+  Smartphone,
+  Tablet,
+  Phone,
+  Zap,
+  ShoppingCart,
   Gamepad2,
   CheckCircle2,
   ArrowRight,
@@ -117,7 +117,7 @@ export default function AppDevelopment() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -129,15 +129,12 @@ export default function AppDevelopment() {
               <span className="text-gradient glow-text">App Development</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-              Build powerful, engaging mobile applications for iOS and Android that connect with 
+              Build powerful, engaging mobile applications for iOS and Android that connect with
               users, drive engagement, and deliver exceptional experiences.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">Start Your App</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">View Portfolio</Link>
               </Button>
             </div>
           </motion.div>
@@ -158,13 +155,13 @@ export default function AppDevelopment() {
                 Mobile Apps That <span className="text-gradient">Drive Results</span>
               </h2>
               <p className="text-lg text-muted-foreground mb-4">
-                At Binary Buddies, we create mobile applications that users love. Whether you need 
-                a native iOS app, Android app, or a cross-platform solution, we deliver high-quality 
+                At Binary Buddies, we create mobile applications that users love. Whether you need
+                a native iOS app, Android app, or a cross-platform solution, we deliver high-quality
                 mobile experiences that engage users and drive business growth.
               </p>
               <p className="text-lg text-muted-foreground mb-6">
-                Our expertise spans native development, cross-platform frameworks, and emerging 
-                technologies. We follow platform-specific design guidelines, ensure optimal 
+                Our expertise spans native development, cross-platform frameworks, and emerging
+                technologies. We follow platform-specific design guidelines, ensure optimal
                 performance, and implement robust security measures for app store approval.
               </p>
               <div className="flex items-center gap-4">
@@ -408,15 +405,12 @@ export default function AppDevelopment() {
             <p className="text-xl text-muted-foreground mb-8">
               Let's create an app that users love and drives business growth
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">
                   Start Your App
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">Get Free Consultation</Link>
               </Button>
             </div>
           </motion.div>

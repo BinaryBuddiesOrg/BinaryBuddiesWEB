@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Globe, 
-  Smartphone, 
-  Zap, 
-  ShoppingCart, 
-  Lock, 
+import {
+  Globe,
+  Smartphone,
+  Zap,
+  ShoppingCart,
+  Lock,
   Search,
   CheckCircle2,
   ArrowRight,
@@ -98,7 +98,7 @@ export default function WebDevelopment() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -110,15 +110,12 @@ export default function WebDevelopment() {
               <span className="text-gradient glow-text">Web Development</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-              Create stunning, high-performance websites and web applications that engage users, 
+              Create stunning, high-performance websites and web applications that engage users,
               drive conversions, and scale with your business.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">Start Your Project</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">View Portfolio</Link>
               </Button>
             </div>
           </motion.div>
@@ -139,13 +136,13 @@ export default function WebDevelopment() {
                 Modern Web Solutions for <span className="text-gradient">Digital Success</span>
               </h2>
               <p className="text-lg text-muted-foreground mb-4">
-                At Binary Buddies, we craft exceptional web experiences that combine cutting-edge 
-                technology with intuitive design. Our web development services cover everything from 
+                At Binary Buddies, we craft exceptional web experiences that combine cutting-edge
+                technology with intuitive design. Our web development services cover everything from
                 simple business websites to complex web applications and e-commerce platforms.
               </p>
               <p className="text-lg text-muted-foreground mb-6">
-                We specialize in responsive, mobile-first designs that work flawlessly across all 
-                devices. Our full-stack expertise ensures seamless integration between frontend and 
+                We specialize in responsive, mobile-first designs that work flawlessly across all
+                devices. Our full-stack expertise ensures seamless integration between frontend and
                 backend, delivering fast, secure, and scalable web solutions.
               </p>
               <div className="flex items-center gap-4">
@@ -339,15 +336,12 @@ export default function WebDevelopment() {
             <p className="text-xl text-muted-foreground mb-8">
               Let's create a stunning website that drives results for your business
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">
                   Start Your Project
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">Get Free Consultation</Link>
               </Button>
             </div>
           </motion.div>

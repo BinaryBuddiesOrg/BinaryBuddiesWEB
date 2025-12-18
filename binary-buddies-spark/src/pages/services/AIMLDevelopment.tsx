@@ -153,12 +153,9 @@ export default function AIMLDevelopment() {
               measurable results. From predictive analytics to generative AI, we build algorithms
               that transform your business outcomes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">Talk to Us</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">Get Free Consultation</Link>
               </Button>
             </div>
           </motion.div>
@@ -379,15 +376,12 @@ export default function AIMLDevelopment() {
             <p className="text-xl text-muted-foreground mb-8">
               Get started today with our AI & ML development services
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">
                   Start Your AI Journey
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">Schedule Consultation</Link>
               </Button>
             </div>
           </motion.div>

@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Code2, 
-  Cloud, 
-  Database, 
-  Shield, 
-  Zap, 
-  Users, 
+import {
+  Code2,
+  Cloud,
+  Database,
+  Shield,
+  Zap,
+  Users,
   CheckCircle2,
   ArrowRight,
   Settings,
@@ -84,7 +84,7 @@ export default function SoftwareDevelopment() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -96,15 +96,12 @@ export default function SoftwareDevelopment() {
               <span className="text-gradient glow-text">Software Development</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-              Transform your business with custom software solutions engineered for performance, 
+              Transform your business with custom software solutions engineered for performance,
               scalability, and innovation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow">
                 <Link to="/contact">Get Started</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="glass hover-glow border-primary/30 px-8 py-6 text-lg">
-                <Link to="/contact">Schedule Consultation</Link>
               </Button>
             </div>
           </motion.div>
@@ -125,13 +122,13 @@ export default function SoftwareDevelopment() {
                 Enterprise-Grade <span className="text-gradient">Software Solutions</span>
               </h2>
               <p className="text-lg text-muted-foreground mb-4">
-                At Binary Buddies, we specialize in developing custom software that drives business 
-                transformation. Our expert team combines cutting-edge technologies with proven 
+                At Binary Buddies, we specialize in developing custom software that drives business
+                transformation. Our expert team combines cutting-edge technologies with proven
                 methodologies to deliver solutions that are robust, scalable, and future-ready.
               </p>
               <p className="text-lg text-muted-foreground mb-6">
-                Whether you need a complete enterprise application, API development, or legacy system 
-                modernization, we provide end-to-end software development services tailored to your 
+                Whether you need a complete enterprise application, API development, or legacy system
+                modernization, we provide end-to-end software development services tailored to your
                 specific industry needs and business objectives.
               </p>
               <div className="flex items-center gap-4">
