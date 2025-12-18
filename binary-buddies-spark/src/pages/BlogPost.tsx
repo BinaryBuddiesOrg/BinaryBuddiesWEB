@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Clock, Share2, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Share2, Loader2, AlertCircle, User } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useBlog } from "@/hooks/useBlogs";
@@ -41,55 +41,59 @@ const BlogPost = () => {
     }
 
     const categoryColors: Record<string, string> = {
-        "AI/ML": "bg-primary/10 text-primary",
-        "Automation": "bg-accent/10 text-accent",
-        "Development": "bg-accent-pink/10 text-accent-pink",
-        "Industry News": "bg-accent-neon/10 text-accent-neon",
+        "AI/ML": "bg-primary text-primary-foreground",
+        "Automation": "bg-accent text-accent-foreground",
+        "Development": "bg-emerald-600 text-white",
+        "Industry News": "bg-blue-600 text-white",
     };
 
     return (
-        <div className="relative min-h-screen">
-            {/* Hero Section */}
-            <section className="relative pt-32 pb-20 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-hero opacity-50" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-
-                <div className="container mx-auto px-4 relative z-10">
+        <div className="relative min-h-screen bg-background">
+            {/* Header Section - Clean and Professional */}
+            <section className="relative pt-28 pb-12 border-b border-border/50">
+                <div className="container mx-auto px-4">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.5 }}
                         className="max-w-4xl mx-auto"
                     >
-                        <Link to="/blog" className="inline-flex items-center text-primary hover:underline mb-8">
+                        {/* Back Link */}
+                        <Link
+                            to="/blog"
+                            className="inline-flex items-center text-primary hover:text-primary/80 transition-colors mb-8 font-medium"
+                        >
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Blog
                         </Link>
 
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
-                            <span className={`px-3 py-1 rounded-full ${categoryColors[post.category] || "bg-primary/10 text-primary"}`}>
+                        {/* Meta Info */}
+                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                            <span className={`px-3 py-1 text-sm font-medium rounded-md ${categoryColors[post.category] || "bg-primary text-primary-foreground"}`}>
                                 {post.category}
                             </span>
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                 <Calendar className="w-4 h-4" />
                                 {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                 <Clock className="w-4 h-4" />
                                 {post.readTime}
                             </span>
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                            <span className="text-gradient glow-text">{post.title}</span>
+                        {/* Title - Clean without blur/glow */}
+                        <h1 className="text-3xl md:text-5xl font-bold mb-8 leading-tight text-foreground">
+                            {post.title}
                         </h1>
 
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                                {post.author.avatar}
+                        {/* Author Info */}
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm">
+                                {post.author.avatar || <User className="w-5 h-5" />}
                             </div>
                             <div>
-                                <p className="font-semibold text-foreground">{post.author.name}</p>
+                                <p className="font-medium text-foreground">{post.author.name}</p>
                                 <p className="text-sm text-muted-foreground">Author</p>
                             </div>
                         </div>
@@ -97,33 +101,45 @@ const BlogPost = () => {
                 </div>
             </section>
 
-            {/* Content Section */}
-            <section className="py-16">
-                <div className="container mx-auto px-4 max-w-3xl">
-                    <motion.div
+            {/* Content Section - Aligned with Header */}
+            <section className="py-12">
+                <div className="container mx-auto px-4">
+                    <motion.article
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="prose prose-invert prose-lg max-w-none glass p-8 md:p-12 rounded-2xl"
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="max-w-4xl mx-auto"
                     >
-                        {/* Lead paragraph */}
-                        <p className="lead text-xl text-muted-foreground mb-8">
-                            {post.excerpt}
-                        </p>
+                        {/* Excerpt/Lead */}
+                        {post.excerpt && (
+                            <p className="text-lg md:text-xl text-muted-foreground mb-8 pb-8 border-b border-border/50 leading-relaxed">
+                                {post.excerpt}
+                            </p>
+                        )}
 
-                        {/* Blog content - rendered as HTML */}
+                        {/* Main Content */}
                         <div
-                            className="blog-content"
+                            className="prose prose-lg max-w-none dark:prose-invert 
+                                prose-headings:text-foreground prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
+                                prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-4
+                                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                                prose-strong:text-foreground prose-strong:font-semibold
+                                prose-ul:my-4 prose-ol:my-4
+                                prose-li:text-foreground/90 prose-li:my-1
+                                prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+                                prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                                prose-pre:bg-muted prose-pre:border prose-pre:border-border"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
 
-                        <div className="mt-12 pt-8 border-t border-primary/20 flex justify-between items-center">
-                            <p className="text-muted-foreground">Share this article:</p>
-                            <div className="flex gap-4">
+                        {/* Share Section */}
+                        <div className="mt-12 pt-8 border-t border-border flex flex-wrap justify-between items-center gap-4">
+                            <p className="text-muted-foreground font-medium">Share this article</p>
+                            <div className="flex gap-2">
                                 <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="hover:text-primary"
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2"
                                     onClick={() => {
                                         if (navigator.share) {
                                             navigator.share({
@@ -136,11 +152,12 @@ const BlogPost = () => {
                                         }
                                     }}
                                 >
-                                    <Share2 className="w-5 h-5" />
+                                    <Share2 className="w-4 h-4" />
+                                    Share
                                 </Button>
                             </div>
                         </div>
-                    </motion.div>
+                    </motion.article>
                 </div>
             </section>
 
