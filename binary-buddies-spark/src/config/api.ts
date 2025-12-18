@@ -25,6 +25,9 @@ export const API_ENDPOINTS = {
     // Careers
     careers: `${API_BASE_URL}/api/bbweb/careers`,
     career: (id: number) => `${API_BASE_URL}/api/bbweb/careers/${id}`,
+
+    // Applications
+    applicationsCreate: `${API_BASE_URL}/api/bbweb/applications/create`,
 } as const;
 
 // API configuration

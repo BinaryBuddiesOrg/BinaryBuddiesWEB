@@ -19,3 +19,5 @@ access_bbweb_job_responsibility_user,bbweb.job.responsibility.user,model_bbweb_j
 access_bbweb_job_responsibility_public,bbweb.job.responsibility.public,model_bbweb_job_responsibility,base.group_public,1,0,0,0
 access_bbweb_lead_user,bbweb.lead.user,model_bbweb_lead,base.group_user,1,1,1,1
 access_bbweb_lead_public,bbweb.lead.public,model_bbweb_lead,base.group_public,1,1,1,0
+access_bbweb_job_application_user,bbweb.job.application.user,model_bbweb_job_application,base.group_user,1,1,1,1
+access_bbweb_job_application_public,bbweb.job.application.public,model_bbweb_job_application,base.group_public,1,1,1,0

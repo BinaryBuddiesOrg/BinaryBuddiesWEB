@@ -10,3 +10,4 @@ from . import career
 from . import job_requirement
 from . import job_responsibility
 from . import lead
+from . import job_application

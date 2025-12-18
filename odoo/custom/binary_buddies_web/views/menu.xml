@@ -40,6 +40,12 @@
               action="action_bbweb_leads"
               sequence="50"/>
 
+    <menuitem id="menu_bbweb_applications"
+              name="Job Applications"
+              parent="menu_bbweb_root"
+              action="action_bbweb_job_application"
+              sequence="55"/>
+
     <!-- Configuration Submenu -->
     <menuitem id="menu_bbweb_config"
               name="Configuration"

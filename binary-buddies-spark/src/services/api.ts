@@ -146,3 +146,48 @@ export async function fetchCareers(options?: FetchCareersOptions): Promise<ApiCa
 export async function fetchCareer(id: number): Promise<ApiCareer> {
     return fetchApi<ApiCareer>(API_ENDPOINTS.career(id));
 }
+
+// ============================================================================
+// Job Applications
+// ============================================================================
+
+export interface SubmitApplicationData {
+    name: string;
+    email: string;
+    phone?: string;
+    careerId: string;
+    coverLetter?: string;
+    resume?: File;
+}
+
+export async function submitApplication(data: SubmitApplicationData): Promise<{ status: string; message: string; id?: number }> {
+    const formData = new FormData();
+
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('career_id', data.careerId);
+
+    if (data.phone) {
+        formData.append('phone', data.phone);
+    }
+    if (data.coverLetter) {
+        formData.append('cover_letter', data.coverLetter);
+    }
+    if (data.resume) {
+        formData.append('resume', data.resume);
+    }
+
+    const response = await fetch(API_ENDPOINTS.applicationsCreate, {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - browser will set it with boundary for multipart
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.status === 'error') {
+        throw new Error(result.message || 'Failed to submit application');
+    }
+
+    return result;
+}
