@@ -213,7 +213,7 @@ export const Navbar = () => {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="bg-card/70 backdrop-blur-2xl border-l border-primary/30 w-[280px] sm:w-[320px]"
+                className="bg-card dark:bg-card/70 backdrop-blur-2xl border-l border-primary/30 w-[280px] sm:w-[320px]"
               >
                 <div className="flex flex-col h-full">
                   {/* Mobile Logo */}
