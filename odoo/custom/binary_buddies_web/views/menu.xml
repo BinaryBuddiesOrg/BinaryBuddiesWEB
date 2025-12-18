@@ -29,10 +29,16 @@
 
     <!-- Career Listings Menu -->
     <menuitem id="menu_bbweb_careers"
-              name="Career Listings"
+              name="Careers"
               parent="menu_bbweb_root"
               action="action_bbweb_career"
               sequence="40"/>
+
+    <menuitem id="menu_bbweb_leads"
+              name="Leads"
+              parent="menu_bbweb_root"
+              action="action_bbweb_leads"
+              sequence="50"/>
 
     <!-- Configuration Submenu -->
     <menuitem id="menu_bbweb_config"

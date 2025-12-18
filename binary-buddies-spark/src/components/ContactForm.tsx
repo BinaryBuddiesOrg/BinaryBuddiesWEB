@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,18 +9,69 @@ import { useToast } from "@/hooks/use-toast";
 
 export const ContactForm = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    service: "",
+    projectDetails: ""
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/bbweb/leads/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          service: formData.service,
+          project_details: formData.projectDetails
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        toast({
+          title: "Message Sent!",
+          description: "We'll get back to you within 24 hours.",
+        });
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          service: "",
+          projectDetails: ""
+        });
+      } else {
+        throw new Error(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <section className="relative py-24 overflow-hidden">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,27 +171,48 @@ export const ContactForm = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">First Name</label>
-                  <Input placeholder="John" required />
+                  <Input
+                    placeholder="John"
+                    required
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Last Name</label>
-                  <Input placeholder="Doe" required />
+                  <Input
+                    placeholder="Doe"
+                    required
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
-                <Input type="email" placeholder="john@company.com" required />
+                <Input
+                  type="email"
+                  placeholder="john@company.com"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">Phone</label>
-                <Input type="tel" placeholder="+1 (555) 123-4567" />
+                <Input
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">Service Interested In</label>
-                <Select>
+                <Select onValueChange={(value) => setFormData({ ...formData, service: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
@@ -150,6 +223,7 @@ export const ContactForm = () => {
                     <SelectItem value="api">API Development</SelectItem>
                     <SelectItem value="product">Product Development</SelectItem>
                     <SelectItem value="ecommerce">E-commerce Solutions</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -160,14 +234,17 @@ export const ContactForm = () => {
                   placeholder="Tell us about your project..."
                   rows={5}
                   required
+                  value={formData.projectDetails}
+                  onChange={(e) => setFormData({ ...formData, projectDetails: e.target.value })}
                 />
               </div>
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-semibold py-6 shadow-glow hover:shadow-glow-strong transition-all duration-300"
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
                 <Send className="ml-2 w-5 h-5" />
               </Button>
             </form>
@@ -176,8 +253,8 @@ export const ContactForm = () => {
       </div>
 
       {/* Background Effects */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
     </section>
   );
 };

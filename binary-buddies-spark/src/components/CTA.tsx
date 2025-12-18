@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const CTA = () => {
   return (
@@ -34,23 +35,18 @@ export const CTA = () => {
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Let's discuss how our cutting-edge solutions can help you achieve your goals. Get a free consultation today.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
+              asChild
               size="lg"
               className="group bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow hover:shadow-glow-strong transition-all duration-300"
             >
-              <Mail className="mr-2 w-5 h-5" />
-              Contact Us
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            
-            <Button
-              size="lg"
-              variant="outline"
-              className="glass hover-glow border-primary/30 font-semibold px-8 py-6 text-lg"
-            >
-              Schedule a Call
+              <Link to="/contact">
+                <Mail className="mr-2 w-5 h-5" />
+                Contact Us
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
 
