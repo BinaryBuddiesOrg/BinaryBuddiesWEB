@@ -17,6 +17,7 @@ import { useTheme } from "@/components/ThemeProvider";
 const navItems = [
   { name: "Home", path: "/" },
   { name: "Products", path: "/products" },
+  { name: "Portfolio", path: "/portfolio" },
   { name: "Blog", path: "/blog" },
   { name: "Careers", path: "/careers" },
   { name: "Contact", path: "/contact" },

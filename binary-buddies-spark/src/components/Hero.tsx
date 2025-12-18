@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
@@ -76,22 +77,39 @@ export const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col md:flex-row gap-4 justify-center items-center flex-wrap"
         >
           <Button
+            asChild
             size="lg"
-            className="group relative overflow-hidden bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow hover:shadow-glow-strong transition-all duration-300"
+            className="group relative overflow-hidden bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-6 text-lg shadow-glow hover:shadow-glow-strong transition-all duration-300 min-w-[200px]"
           >
-            Get Started
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Link to="/contact">
+              Get Started
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </Button>
 
           <Button
+            asChild
             size="lg"
             variant="outline"
-            className="glass hover-glow border-primary/30 text-foreground font-semibold px-8 py-6 text-lg"
+            className="glass hover-glow border-primary/30 text-foreground font-semibold px-8 py-6 text-lg min-w-[200px] hover:bg-primary/10 hover:text-foreground transition-colors"
           >
-            View Our Work
+            <Link to="/portfolio">
+              View Our Work
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="glass hover-glow border-primary/30 text-foreground font-semibold px-8 py-6 text-lg min-w-[200px] hover:bg-primary/10 hover:text-primary transition-colors"
+          >
+            <Link to="/products">
+              Our Products
+            </Link>
           </Button>
         </motion.div>
 
@@ -103,10 +121,10 @@ export const Hero = () => {
           className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 max-w-4xl mx-auto"
         >
           {[
-            { number: "250+", label: "Enterprise Clients" },
+            { number: "50+", label: "Enterprise Clients" },
             { number: "99.9%", label: "Uptime SLA" },
-            { number: "85+", label: "AI/ML Engineers" },
-            { number: "$2.5B+", label: "Client Revenue Impact" },
+            { number: "100+", label: "Expert Engineers" },
+            { number: "500+", label: "Projects Delivered" },
           ].map((stat, index) => (
             <div key={index} className="glass hover-glow p-6 rounded-xl">
               <div className="text-3xl md:text-4xl font-bold text-gradient mb-2">

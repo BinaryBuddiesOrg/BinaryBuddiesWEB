@@ -73,13 +73,13 @@ export const TrustIndicators = () => {
           <p className="text-muted-foreground mb-8 uppercase tracking-wider text-sm">
             Trusted by Leading Companies
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-12 opacity-50">
-            {[...Array(6)].map((_, i) => (
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-50">
+            {["TechCorp", "GlobalSystems", "FutureNet", "DataFlow", "CloudScale", "InnovateInc"].map((company, i) => (
               <div
                 key={i}
-                className="w-32 h-12 glass rounded-lg flex items-center justify-center text-primary font-bold"
+                className="px-6 py-3 glass rounded-lg flex items-center justify-center text-primary font-bold text-lg tracking-wide"
               >
-                LOGO {i + 1}
+                {company}
               </div>
             ))}
           </div>

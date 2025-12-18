@@ -15,6 +15,7 @@ import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 import Products from "./pages/Products";
+import Portfolio from "./pages/Portfolio";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookieConsent from "./components/CookieConsent";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/careers" element={<Careers />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
