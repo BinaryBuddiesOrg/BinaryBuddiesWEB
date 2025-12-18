@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Brain, Clock, CheckCircle, Lightbulb, 
+import {
+  Brain, Clock, CheckCircle, Lightbulb,
   Settings, Rocket, Target, TrendingUp,
   Code, Shield, Zap, Database, ArrowRight
 } from "lucide-react";
@@ -146,7 +146,7 @@ export const ProblemSolver = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             From problem identification to solution delivery, we follow a systematic approach that ensures success at every stage
           </p>
-          
+
           {/* Interactive Controls */}
           <div className="flex items-center justify-center gap-4 mb-8">
             <button
@@ -228,18 +228,17 @@ export const ProblemSolver = () => {
             {workflowStages.map((stage, index) => {
               const isActive = currentStage === index;
               const isCompleted = completedStages.includes(index);
-              
+
               return (
                 <button
                   key={stage.id}
                   onClick={() => handleStageClick(index)}
-                  className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-primary text-primary-foreground shadow-glow' 
-                      : isCompleted 
-                        ? 'bg-primary/20 text-primary border border-primary/30' 
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                  }`}
+                  className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 ${isActive
+                    ? 'bg-primary text-primary-foreground shadow-glow'
+                    : isCompleted
+                      ? 'bg-primary/20 text-primary border border-primary/30'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    }`}
                 >
                   <span className="hidden sm:inline">{index + 1}. </span>
                   <span className="sm:hidden">{index + 1}</span>
@@ -258,13 +257,13 @@ export const ProblemSolver = () => {
             {workflowStages.map((stage, index) => {
               const isActive = currentStage === index;
               const isCompleted = completedStages.includes(index);
-              
+
               return (
                 <motion.div
                   key={stage.id}
                   className="cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ 
+                  animate={{
                     opacity: isActive || isCompleted ? 1 : 0.6,
                     scale: isActive ? 1.05 : 1
                   }}
@@ -272,10 +271,9 @@ export const ProblemSolver = () => {
                   onClick={() => handleStageClick(index)}
                 >
                   {/* Stage Card */}
-                  <div className={`glass p-4 md:p-6 rounded-xl relative overflow-hidden text-center backdrop-blur-xl bg-card/60 transition-all duration-300 h-full ${
-                    isActive ? 'border-2 border-primary shadow-glow' : 
+                  <div className={`p-4 md:p-6 rounded-xl relative overflow-hidden text-center backdrop-blur-sm bg-card/60 transition-all duration-300 h-full ${isActive ? 'border-2 border-primary shadow-lg' :
                     isCompleted ? 'border border-primary/50' : 'border border-muted'
-                  }`}>
+                    }`}>
                     {/* Active stage glow */}
                     {isActive && (
                       <motion.div
@@ -285,7 +283,7 @@ export const ProblemSolver = () => {
                         transition={{ duration: 0.3 }}
                       />
                     )}
-                    
+
                     {/* Completed stage checkmark */}
                     {isCompleted && (
                       <motion.div
@@ -297,34 +295,31 @@ export const ProblemSolver = () => {
                         <CheckCircle className="w-4 h-4 text-primary-foreground" />
                       </motion.div>
                     )}
-                    
-                    
+
+
                     {/* Stage Icon */}
-                    <div className={`inline-flex p-3 md:p-4 rounded-xl mb-3 md:mb-4 ${
-                      isActive ? `bg-${stage.color}/20 shadow-glow` : 
+                    <div className={`inline-flex p-3 md:p-4 rounded-xl mb-3 md:mb-4 ${isActive ? `bg-${stage.color}/20 shadow-md` :
                       isCompleted ? `bg-${stage.color}/10` : 'bg-muted/20'
-                    }`}>
+                      }`}>
                       {React.createElement(stage.icon, {
-                        className: `w-6 h-6 md:w-8 md:h-8 ${
-                          isActive ? `text-${stage.color}` : 
+                        className: `w-6 h-6 md:w-8 md:h-8 ${isActive ? `text-${stage.color}` :
                           isCompleted ? `text-${stage.color}` : 'text-muted-foreground'
-                        }`
+                          }`
                       })}
                     </div>
-                    
+
                     {/* Stage Title */}
-                    <h3 className={`text-base md:text-lg font-bold mb-2 md:mb-3 ${
-                      isActive ? 'text-gradient' : 
+                    <h3 className={`text-base md:text-lg font-bold mb-2 md:mb-3 ${isActive ? 'text-gradient' :
                       isCompleted ? 'text-foreground' : 'text-muted-foreground'
-                    }`}>
+                      }`}>
                       {stage.title}
                     </h3>
-                    
+
                     {/* Stage Description */}
                     <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4 leading-relaxed">
                       {stage.description}
                     </p>
-                    
+
                     {/* Stage Details - Only show for active stage */}
                     {isActive && (
                       <motion.div
@@ -341,7 +336,7 @@ export const ProblemSolver = () => {
                         ))}
                       </motion.div>
                     )}
-                    
+
                     {/* Progress indicator */}
                     {isActive && (
                       <motion.div
@@ -362,7 +357,7 @@ export const ProblemSolver = () => {
               );
             })}
           </div>
-          
+
         </div>
       </div>
 

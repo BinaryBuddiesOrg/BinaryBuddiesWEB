@@ -64,8 +64,7 @@ const Careers = () => {
                         transition={{ duration: 0.8 }}
                         className="flex items-center justify-center gap-2 mb-6"
                     >
-                        <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-                        <span className="text-primary font-semibold tracking-wider uppercase text-sm">
+                        <span className="text-muted-foreground font-semibold tracking-wider uppercase text-sm">
                             Join Our Team
                         </span>
                     </motion.div>

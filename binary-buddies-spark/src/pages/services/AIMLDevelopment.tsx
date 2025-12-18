@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Brain, 
-  Bot, 
-  Eye, 
-  MessageSquare, 
-  TrendingUp, 
+import {
+  Brain,
+  Bot,
+  Eye,
+  MessageSquare,
+  TrendingUp,
   Zap,
   CheckCircle2,
   ArrowRight,
@@ -130,7 +130,7 @@ export default function AIMLDevelopment() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -139,8 +139,7 @@ export default function AIMLDevelopment() {
             className="text-center max-w-4xl mx-auto"
           >
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
-              <span className="text-primary font-semibold tracking-wider uppercase text-sm">
+              <span className="text-muted-foreground font-semibold tracking-wider uppercase text-sm">
                 Predict + Adapt + Automate
               </span>
             </div>
@@ -150,8 +149,8 @@ export default function AIMLDevelopment() {
               <span className="text-foreground">Development Services</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-              Transforming businesses with intelligent solutions that learn, adapt, and deliver 
-              measurable results. From predictive analytics to generative AI, we build algorithms 
+              Transforming businesses with intelligent solutions that learn, adapt, and deliver
+              measurable results. From predictive analytics to generative AI, we build algorithms
               that transform your business outcomes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -203,16 +202,16 @@ export default function AIMLDevelopment() {
                 Drive Intelligence, <span className="text-gradient">Deliver Results</span>
               </h2>
               <p className="text-lg text-muted-foreground mb-4">
-                At Binary Buddies, with 12+ years of expertise, we build algorithms and architect 
-                intelligent systems that learn, adapt, and transform your business outcomes. Our AI 
-                and ML services go beyond traditional automation, empowering you to discover patterns, 
+                At Binary Buddies, with 12+ years of expertise, we build algorithms and architect
+                intelligent systems that learn, adapt, and transform your business outcomes. Our AI
+                and ML services go beyond traditional automation, empowering you to discover patterns,
                 extract actionable insights, and make real-time, data-driven decisions.
               </p>
               <p className="text-lg text-muted-foreground mb-6">
-                From predictive maintenance in manufacturing to intelligent chatbots in customer service, 
-                and AI-powered risk scoring in finance, our solutions are designed to augment human 
-                intelligence and maximize business potential. We deliver custom AI/ML development 
-                services tailored to your domain, ensuring speed, accuracy, and compliance across every 
+                From predictive maintenance in manufacturing to intelligent chatbots in customer service,
+                and AI-powered risk scoring in finance, our solutions are designed to augment human
+                intelligence and maximize business potential. We deliver custom AI/ML development
+                services tailored to your domain, ensuring speed, accuracy, and compliance across every
                 AI touchpoint.
               </p>
               <div className="flex items-center gap-4">

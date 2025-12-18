@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Menu, Sparkles, ChevronDown, Sun, Moon } from "lucide-react";
+import { Menu, ChevronDown, Sun, Moon } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import { useTheme } from "@/components/ThemeProvider";
 
 const navItems = [
   { name: "Home", path: "/" },
+  { name: "Products", path: "/products" },
   { name: "Blog", path: "/blog" },
   { name: "Careers", path: "/careers" },
   { name: "Contact", path: "/contact" },
@@ -69,15 +70,15 @@ export const Navbar = () => {
             to="/"
             className="flex items-center gap-2 group"
           >
+
             <motion.div
-              whileHover={{ scale: 1.1, rotate: 180 }}
+              whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.3 }}
             >
-              <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-primary animate-pulse" />
+              <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
             </motion.div>
-            <span className="text-xl md:text-2xl font-bold">
-              <span className="text-gradient">Binary</span>{" "}
-              <span className="text-accent">Buddies</span>
+            <span className="text-xl md:text-2xl font-bold text-foreground">
+              Binary Buddies
             </span>
           </Link>
 
@@ -218,10 +219,9 @@ export const Navbar = () => {
                 <div className="flex flex-col h-full">
                   {/* Mobile Logo */}
                   <div className="flex items-center gap-2 mb-8 pt-4">
-                    <Sparkles className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">
-                      <span className="text-gradient">Binary</span>{" "}
-                      <span className="text-accent">Buddies</span>
+                    <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain" />
+                    <span className="text-xl font-bold text-foreground">
+                      Binary Buddies
                     </span>
                   </div>
 

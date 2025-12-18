@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export const Hero = () => {
   return (
@@ -45,8 +45,7 @@ export const Hero = () => {
           transition={{ duration: 0.8 }}
           className="flex items-center justify-center gap-2 mb-6"
         >
-          <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-          <span className="text-primary font-semibold tracking-wider uppercase text-sm">
+          <span className="text-muted-foreground font-semibold tracking-wider uppercase text-sm">
             Enterprise AI & Automation Experts
           </span>
         </motion.div>
