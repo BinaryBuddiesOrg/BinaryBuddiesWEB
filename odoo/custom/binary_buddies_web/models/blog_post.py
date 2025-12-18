@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 import base64
+import re
 
 
 class BlogPost(models.Model):
@@ -11,7 +12,19 @@ class BlogPost(models.Model):
 
     title = fields.Char(string='Title', required=True)
     excerpt = fields.Text(string='Excerpt', required=True, help='Short summary of the blog post')
-    content = fields.Html(string='Content', required=True)
+    # Completely disable sanitization to allow iframe embeds (YouTube, Vimeo, etc.)
+    # Note: Only trusted admin users should edit blog content
+    content = fields.Html(
+        string='Content', 
+        required=True, 
+        sanitize=False,
+        sanitize_tags=False,
+        sanitize_attributes=False,
+        sanitize_style=False,
+        sanitize_form=False,
+        strip_style=False,
+        strip_classes=False,
+    )
     
     category = fields.Selection([
         ('ai_ml', 'AI/ML'),
@@ -36,6 +49,41 @@ class BlogPost(models.Model):
     featured = fields.Boolean(string='Featured Post', default=False)
     active = fields.Boolean(string='Active', default=True)
     
+    def _get_base_url(self):
+        """Get the base URL for the Odoo instance"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        return base_url or 'http://localhost:8069'
+    
+    def _process_html_content(self, html_content):
+        """
+        Process HTML content to convert relative URLs to absolute URLs.
+        This ensures images and other resources load correctly on the frontend.
+        """
+        if not html_content:
+            return html_content
+        
+        base_url = self._get_base_url()
+        
+        # Pattern to match src attributes with relative URLs
+        # Matches: src="/web/image/...", src="/web/content/...", src="/web_editor/..."
+        patterns = [
+            (r'src="(/web/image[^"]*)"', f'src="{base_url}\\1"'),
+            (r'src="(/web/content[^"]*)"', f'src="{base_url}\\1"'),
+            (r'src="(/web_editor[^"]*)"', f'src="{base_url}\\1"'),
+            (r"src='(/web/image[^']*)'", f"src='{base_url}\\1'"),
+            (r"src='(/web/content[^']*)'", f"src='{base_url}\\1'"),
+            (r"src='(/web_editor[^']*)'", f"src='{base_url}\\1'"),
+            # Also handle href for links to images/files
+            (r'href="(/web/image[^"]*)"', f'href="{base_url}\\1"'),
+            (r'href="(/web/content[^"]*)"', f'href="{base_url}\\1"'),
+        ]
+        
+        processed_content = html_content
+        for pattern, replacement in patterns:
+            processed_content = re.sub(pattern, replacement, processed_content)
+        
+        return processed_content
+    
     @api.model
     def get_api_data(self, category_filter=None, featured_only=False):
         """Return data formatted for API consumption"""
@@ -59,11 +107,14 @@ class BlogPost(models.Model):
         }
         
         for post in posts:
+            # Process content to fix relative URLs
+            processed_content = post._process_html_content(post.content)
+            
             result.append({
                 'id': str(post.id),
                 'title': post.title,
                 'excerpt': post.excerpt,
-                'content': post.content,
+                'content': processed_content,
                 'category': category_map.get(post.category, post.category),
                 'author': {
                     'name': post.author_name,
@@ -76,3 +127,4 @@ class BlogPost(models.Model):
             })
         
         return result
+

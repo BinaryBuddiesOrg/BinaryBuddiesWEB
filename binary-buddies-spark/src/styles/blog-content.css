@@ -1,0 +1,307 @@
+/* Blog Content Styles
+ * Comprehensive styling for rich HTML content from Odoo's WYSIWYG editor
+ */
+
+/* Base prose container for blog content */
+.blog-prose {
+    @apply text-foreground leading-relaxed;
+    font-size: 1.125rem;
+    line-height: 1.8;
+}
+
+/* Headings */
+.blog-prose h1 {
+    @apply text-3xl md:text-4xl font-bold text-foreground mt-10 mb-4;
+}
+
+.blog-prose h2 {
+    @apply text-2xl md:text-3xl font-bold text-foreground mt-8 mb-4;
+    border-bottom: 1px solid hsl(var(--border));
+    padding-bottom: 0.5rem;
+}
+
+.blog-prose h3 {
+    @apply text-xl md:text-2xl font-semibold text-foreground mt-6 mb-3;
+}
+
+.blog-prose h4 {
+    @apply text-lg md:text-xl font-semibold text-foreground mt-5 mb-2;
+}
+
+.blog-prose h5,
+.blog-prose h6 {
+    @apply text-base md:text-lg font-semibold text-foreground mt-4 mb-2;
+}
+
+/* Paragraphs */
+.blog-prose p {
+    @apply mb-4 text-foreground/90;
+}
+
+/* Links */
+.blog-prose a {
+    @apply text-primary font-medium no-underline;
+    transition: all 0.2s ease;
+}
+
+.blog-prose a:hover {
+    @apply text-primary/80 underline;
+}
+
+/* Bold and Italic */
+.blog-prose strong,
+.blog-prose b {
+    @apply font-bold text-foreground;
+}
+
+.blog-prose em,
+.blog-prose i {
+    @apply italic;
+}
+
+/* Lists */
+.blog-prose ul {
+    @apply list-disc list-inside my-4 space-y-2;
+}
+
+.blog-prose ol {
+    @apply list-decimal list-inside my-4 space-y-2;
+}
+
+.blog-prose li {
+    @apply text-foreground/90;
+}
+
+.blog-prose li::marker {
+    @apply text-primary;
+}
+
+/* Nested lists */
+.blog-prose ul ul,
+.blog-prose ol ol,
+.blog-prose ul ol,
+.blog-prose ol ul {
+    @apply ml-6 mt-2;
+}
+
+/* Blockquotes */
+.blog-prose blockquote {
+    @apply border-l-4 border-primary bg-muted/30 py-4 px-6 my-6 rounded-r-lg italic;
+}
+
+.blog-prose blockquote p {
+    @apply mb-0;
+}
+
+/* Images */
+.blog-prose img {
+    @apply max-w-full h-auto rounded-lg my-6 mx-auto block;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Image with caption (figure) */
+.blog-prose figure {
+    @apply my-8 text-center;
+}
+
+.blog-prose figure img {
+    @apply my-0;
+}
+
+.blog-prose figcaption {
+    @apply text-sm text-muted-foreground mt-3 italic;
+}
+
+/* Video Embeds - Responsive 16:9 Container */
+.blog-prose .video-embed,
+.blog-prose .video-container,
+.blog-prose .embed-responsive {
+    @apply relative w-full my-8 rounded-lg overflow-hidden;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.blog-prose .video-embed iframe,
+.blog-prose .video-container iframe,
+.blog-prose .embed-responsive iframe {
+    @apply absolute top-0 left-0 w-full h-full;
+    border: 0;
+}
+
+/* Direct iframe embed (YouTube, Vimeo, etc.) */
+.blog-prose iframe {
+    @apply max-w-full rounded-lg my-6;
+}
+
+/* Responsive iframe container - auto-detect YouTube/Vimeo */
+.blog-prose iframe[src*="youtube"],
+.blog-prose iframe[src*="vimeo"],
+.blog-prose iframe[src*="youtu.be"] {
+    @apply w-full aspect-video;
+    height: auto;
+}
+
+/* Code - Inline */
+.blog-prose code {
+    @apply bg-muted text-primary px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+/* Code - Block */
+.blog-prose pre {
+    @apply bg-muted border border-border rounded-lg p-4 my-6 overflow-x-auto;
+}
+
+.blog-prose pre code {
+    @apply bg-transparent p-0 text-foreground text-sm;
+}
+
+/* Tables */
+.blog-prose table {
+    @apply w-full border-collapse my-6;
+}
+
+.blog-prose th {
+    @apply bg-muted text-foreground font-semibold text-left px-4 py-3 border border-border;
+}
+
+.blog-prose td {
+    @apply px-4 py-3 border border-border text-foreground/90;
+}
+
+.blog-prose tr:nth-child(even) {
+    @apply bg-muted/30;
+}
+
+/* Horizontal Rule */
+.blog-prose hr {
+    @apply border-0 border-t border-border my-8;
+}
+
+/* Text Alignment (from Odoo editor) */
+.blog-prose .text-center,
+.blog-prose [style*="text-align: center"] {
+    text-align: center;
+}
+
+.blog-prose .text-right,
+.blog-prose [style*="text-align: right"] {
+    text-align: right;
+}
+
+.blog-prose .text-justify,
+.blog-prose [style*="text-align: justify"] {
+    text-align: justify;
+}
+
+/* Color support - preserve inline styles from Odoo */
+.blog-prose [style*="color:"] {
+    /* Preserved from inline styles */
+}
+
+.blog-prose [style*="background-color:"] {
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.125rem;
+}
+
+/* Odoo specific classes */
+.blog-prose .o_image_floating {
+    @apply float-left mr-6 mb-4;
+    max-width: 50%;
+}
+
+.blog-prose .o_image_floating.o_float_end {
+    @apply float-right ml-6 mr-0;
+}
+
+/* Alert/Info boxes */
+.blog-prose .alert,
+.blog-prose .note,
+.blog-prose .tip,
+.blog-prose .warning {
+    @apply p-4 rounded-lg my-6 border-l-4;
+}
+
+.blog-prose .alert-info,
+.blog-prose .note {
+    @apply bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-800 dark:text-blue-200;
+}
+
+.blog-prose .alert-success,
+.blog-prose .tip {
+    @apply bg-green-50 dark:bg-green-950/30 border-green-500 text-green-800 dark:text-green-200;
+}
+
+.blog-prose .alert-warning,
+.blog-prose .warning {
+    @apply bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500 text-yellow-800 dark:text-yellow-200;
+}
+
+.blog-prose .alert-danger {
+    @apply bg-red-50 dark:bg-red-950/30 border-red-500 text-red-800 dark:text-red-200;
+}
+
+/* Checklists */
+.blog-prose .o_checklist {
+    @apply list-none pl-0;
+}
+
+.blog-prose .o_checklist li {
+    @apply flex items-start gap-2;
+}
+
+.blog-prose .o_checklist li::before {
+    content: "☐";
+    @apply text-primary;
+}
+
+.blog-prose .o_checklist li.o_checked::before {
+    content: "☑";
+}
+
+/* Buttons/CTAs in content */
+.blog-prose .btn,
+.blog-prose a.button {
+    @apply inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium no-underline;
+    transition: all 0.2s ease;
+}
+
+.blog-prose .btn:hover,
+.blog-prose a.button:hover {
+    @apply bg-primary/90 no-underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .blog-prose {
+        font-size: 1rem;
+    }
+
+    .blog-prose h1 {
+        @apply text-2xl;
+    }
+
+    .blog-prose h2 {
+        @apply text-xl;
+    }
+
+    .blog-prose h3 {
+        @apply text-lg;
+    }
+
+    .blog-prose img {
+        @apply my-4;
+    }
+
+    .blog-prose .o_image_floating {
+        @apply float-none w-full mr-0 mb-4;
+        max-width: 100%;
+    }
+
+    .blog-prose table {
+        @apply text-sm;
+    }
+
+    .blog-prose th,
+    .blog-prose td {
+        @apply px-2 py-2;
+    }
+}

@@ -156,11 +156,14 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'industry_news': 'Industry News',
             }
             
+            # Process content to fix relative URLs for images
+            processed_content = blog._process_html_content(blog.content)
+            
             data = {
                 'id': str(blog.id),
                 'title': blog.title,
                 'excerpt': blog.excerpt,
-                'content': blog.content,
+                'content': processed_content,
                 'category': category_map.get(blog.category, blog.category),
                 'author': {
                     'name': blog.author_name,

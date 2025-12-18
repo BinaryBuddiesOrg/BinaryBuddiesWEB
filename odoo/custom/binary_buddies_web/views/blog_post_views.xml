@@ -47,8 +47,19 @@
                         <field name="excerpt" placeholder="Short summary of the blog post..."/>
                     </group>
                     <notebook>
-                        <page string="Content" name="content">
-                            <field name="content" widget="html"/>
+                        <page string="Content (Visual Editor)" name="content_visual">
+                            <field name="content" widget="html" options="{'full': True, 'codeview': True, 'collaborative': False, 'sanitize': False, 'sanitize_tags': False}"/>
+                            <div class="alert alert-warning mt-2" role="alert">
+                                <strong>Note:</strong> Use the visual editor for formatting. For iframes/videos, use the "HTML Source" tab.
+                            </div>
+                        </page>
+                        <page string="HTML Source (Advanced)" name="content_source">
+                            <group>
+                                <field name="content" widget="ace" options="{'mode': 'html'}"  nolabel="1"/>
+                            </group>
+                            <div class="alert alert-info mt-2" role="alert">
+                                <strong>HTML Code Editor:</strong> Paste iframe codes and custom HTML here. Changes sync with the Visual Editor tab.
+                            </div>
                         </page>
                     </notebook>
                 </sheet>
