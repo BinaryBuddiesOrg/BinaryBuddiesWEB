@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Project Tags -->
+    <record id="tag_ai" model="bbweb.project.tag">
+        <field name="name">AI</field>
+        <field name="color">1</field>
+    </record>
+    <record id="tag_ml" model="bbweb.project.tag">
+        <field name="name">Machine Learning</field>
+        <field name="color">2</field>
+    </record>
+    <record id="tag_healthcare" model="bbweb.project.tag">
+        <field name="name">Healthcare</field>
+        <field name="color">3</field>
+    </record>
+    <record id="tag_automation" model="bbweb.project.tag">
+        <field name="name">Automation</field>
+        <field name="color">4</field>
+    </record>
+    <record id="tag_ecommerce" model="bbweb.project.tag">
+        <field name="name">E-commerce</field>
+        <field name="color">5</field>
+    </record>
+    <record id="tag_rpa" model="bbweb.project.tag">
+        <field name="name">RPA</field>
+        <field name="color">6</field>
+    </record>
+    <record id="tag_fintech" model="bbweb.project.tag">
+        <field name="name">Fintech</field>
+        <field name="color">7</field>
+    </record>
+    <record id="tag_mobile" model="bbweb.project.tag">
+        <field name="name">Mobile</field>
+        <field name="color">8</field>
+    </record>
+    <record id="tag_security" model="bbweb.project.tag">
+        <field name="name">Security</field>
+        <field name="color">9</field>
+    </record>
+    <record id="tag_iot" model="bbweb.project.tag">
+        <field name="name">IoT</field>
+        <field name="color">10</field>
+    </record>
+    <record id="tag_analytics" model="bbweb.project.tag">
+        <field name="name">Analytics</field>
+        <field name="color">1</field>
+    </record>
+    <record id="tag_industry40" model="bbweb.project.tag">
+        <field name="name">Industry 4.0</field>
+        <field name="color">2</field>
+    </record>
+    <record id="tag_nlp" model="bbweb.project.tag">
+        <field name="name">NLP</field>
+        <field name="color">3</field>
+    </record>
+    <record id="tag_saas" model="bbweb.project.tag">
+        <field name="name">SaaS</field>
+        <field name="color">4</field>
+    </record>
+    <record id="tag_bigdata" model="bbweb.project.tag">
+        <field name="name">Big Data</field>
+        <field name="color">5</field>
+    </record>
+    <record id="tag_visualization" model="bbweb.project.tag">
+        <field name="name">Visualization</field>
+        <field name="color">6</field>
+    </record>
+    <record id="tag_smartcity" model="bbweb.project.tag">
+        <field name="name">Smart City</field>
+        <field name="color">7</field>
+    </record>
+
+    <!-- Featured Project 1: AI-Powered Healthcare Platform -->
+    <record id="project_healthcare" model="bbweb.featured.project">
+        <field name="name">AI-Powered Healthcare Platform</field>
+        <field name="category">Healthcare</field>
+        <field name="description">Revolutionized patient care with predictive analytics and automated diagnosis assistance.</field>
+        <field name="gradient">from-primary/20 to-accent/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_ai'), ref('tag_ml'), ref('tag_healthcare')])]"/>
+        <field name="sequence">10</field>
+    </record>
+    <record id="project_healthcare_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_healthcare"/>
+        <field name="result">50% faster diagnosis</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_healthcare_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_healthcare"/>
+        <field name="result">98% accuracy rate</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_healthcare_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_healthcare"/>
+        <field name="result">500+ hospitals</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <!-- Featured Project 2: E-commerce Automation Suite -->
+    <record id="project_ecommerce" model="bbweb.featured.project">
+        <field name="name">E-commerce Automation Suite</field>
+        <field name="category">Retail</field>
+        <field name="description">Complete automation solution handling inventory, orders, and customer service.</field>
+        <field name="gradient">from-accent/20 to-primary/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_automation'), ref('tag_ecommerce'), ref('tag_rpa')])]"/>
+        <field name="sequence">20</field>
+    </record>
+    <record id="project_ecommerce_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_ecommerce"/>
+        <field name="result">70% cost reduction</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_ecommerce_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_ecommerce"/>
+        <field name="result">24/7 automation</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_ecommerce_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_ecommerce"/>
+        <field name="result">1M+ transactions/day</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <!-- Featured Project 3: Fintech Mobile Application -->
+    <record id="project_fintech" model="bbweb.featured.project">
+        <field name="name">Fintech Mobile Application</field>
+        <field name="category">Finance</field>
+        <field name="description">Secure mobile banking solution with AI fraud detection and real-time analytics.</field>
+        <field name="gradient">from-primary/20 to-accent/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_fintech'), ref('tag_mobile'), ref('tag_security')])]"/>
+        <field name="sequence">30</field>
+    </record>
+    <record id="project_fintech_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_fintech"/>
+        <field name="result">Zero security breaches</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_fintech_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_fintech"/>
+        <field name="result">2M+ active users</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_fintech_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_fintech"/>
+        <field name="result">4.8★ rating</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <!-- Featured Project 4: IoT Manufacturing Platform -->
+    <record id="project_iot" model="bbweb.featured.project">
+        <field name="name">IoT Manufacturing Platform</field>
+        <field name="category">Manufacturing</field>
+        <field name="description">Connected factory solution with predictive maintenance and real-time monitoring.</field>
+        <field name="gradient">from-accent/20 to-primary/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_iot'), ref('tag_analytics'), ref('tag_industry40')])]"/>
+        <field name="sequence">40</field>
+    </record>
+    <record id="project_iot_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_iot"/>
+        <field name="result">40% downtime reduction</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_iot_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_iot"/>
+        <field name="result">100+ factories</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_iot_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_iot"/>
+        <field name="result">Real-time insights</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <!-- Featured Project 5: AI Content Generation Tool -->
+    <record id="project_content" model="bbweb.featured.project">
+        <field name="name">AI Content Generation Tool</field>
+        <field name="category">Marketing</field>
+        <field name="description">Advanced content creation platform powered by GPT-4 and custom ML models.</field>
+        <field name="gradient">from-primary/20 to-accent/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_ai'), ref('tag_nlp'), ref('tag_saas')])]"/>
+        <field name="sequence">50</field>
+    </record>
+    <record id="project_content_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_content"/>
+        <field name="result">10x content output</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_content_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_content"/>
+        <field name="result">95% satisfaction</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_content_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_content"/>
+        <field name="result">50K+ users</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <!-- Featured Project 6: Smart City Dashboard -->
+    <record id="project_smartcity" model="bbweb.featured.project">
+        <field name="name">Smart City Dashboard</field>
+        <field name="category">Government</field>
+        <field name="description">Comprehensive city management system with real-time data visualization.</field>
+        <field name="gradient">from-accent/20 to-primary/20</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('tag_bigdata'), ref('tag_visualization'), ref('tag_smartcity')])]"/>
+        <field name="sequence">60</field>
+    </record>
+    <record id="project_smartcity_result1" model="bbweb.project.result">
+        <field name="project_id" ref="project_smartcity"/>
+        <field name="result">30% efficiency gain</field>
+        <field name="sequence">1</field>
+    </record>
+    <record id="project_smartcity_result2" model="bbweb.project.result">
+        <field name="project_id" ref="project_smartcity"/>
+        <field name="result">500K+ citizens</field>
+        <field name="sequence">2</field>
+    </record>
+    <record id="project_smartcity_result3" model="bbweb.project.result">
+        <field name="project_id" ref="project_smartcity"/>
+        <field name="result">Award-winning</field>
+        <field name="sequence">3</field>
+    </record>
+</odoo>

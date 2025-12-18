@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Target, Users, Rocket, Award } from "lucide-react";
+import { Sparkles, Target, Users, Rocket, Award, Loader2, AlertCircle } from "lucide-react";
 import { JobCard } from "@/components/JobCard";
 import { BenefitCard } from "@/components/BenefitCard";
 import { Footer } from "@/components/Footer";
-import { jobs, benefits, testimonials } from "@/data/careersData";
+import { benefits, testimonials } from "@/data/careersData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useCareers } from "@/hooks/useCareers";
 
 const Careers = () => {
     const [selectedDepartment, setSelectedDepartment] = useState("All");
 
-    const departments = ["All", ...Array.from(new Set(jobs.map(job => job.department)))];
+    // Fetch careers based on selected department
+    const departmentFilter = selectedDepartment !== "All" ? selectedDepartment : undefined;
+    const { data: jobs, isLoading, error } = useCareers({ department: departmentFilter });
 
-    const filteredJobs = selectedDepartment === "All"
-        ? jobs
-        : jobs.filter(job => job.department === selectedDepartment);
+    const departments = ["All", ...Array.from(new Set(jobs?.map(job => job.department) || []))];
+
+    const filteredJobs = jobs || [];
 
     return (
         <div className="relative">
@@ -195,41 +198,84 @@ const Careers = () => {
                             Find your perfect role and apply today
                         </p>
                     </motion.div>
-
-                    {/* Department Filter */}
-                    <div className="flex flex-wrap justify-center gap-3 mb-12">
-                        {departments.map((dept) => (
-                            <Button
-                                key={dept}
-                                onClick={() => setSelectedDepartment(dept)}
-                                variant={selectedDepartment === dept ? "default" : "outline"}
-                                className={
-                                    selectedDepartment === dept
-                                        ? "bg-primary hover:bg-primary-glow text-primary-foreground shadow-glow"
-                                        : "glass border-primary/30 hover:border-primary/50"
-                                }
-                            >
-                                {dept}
-                            </Button>
-                        ))}
-                    </div>
-
-                    {/* Job Listings */}
-                    <div className="space-y-6">
-                        {filteredJobs.map((job, index) => (
-                            <JobCard key={job.id} job={job} index={index} />
-                        ))}
-                    </div>
-
-                    {filteredJobs.length === 0 && (
-                        <div className="text-center py-16">
-                            <p className="text-muted-foreground text-lg">
-                                No positions found in this department. Check back soon!
-                            </p>
-                        </div>
-                    )}
                 </div>
             </section>
+
+            {/* Loading State */}
+            {isLoading && (
+                <section className="container mx-auto px-4 py-16">
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                </section>
+            )}
+
+            {/* Error State */}
+            {error && (
+                <section className="container mx-auto px-4 py-16">
+                    <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                        <AlertCircle className="h-12 w-12 text-destructive" />
+                        <p className="text-lg text-muted-foreground">Failed to load career listings. Please try again later.</p>
+                    </div>
+                </section>
+            )}
+
+            {/* Content - Only show when not loading and no error */}
+            {!isLoading && !error && (
+                <>
+                    {/* Job Listings */}
+                    <section className="py-16 md:py-24 pt-0"> {/* pt-0 to avoid double padding with previous section */}
+                        <div className="container mx-auto px-4">
+                            {/* Department Filter */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6 }}
+                                className="flex flex-wrap gap-3 justify-center mb-12"
+                            >
+                                {departments.map((dept) => (
+                                    <Button
+                                        key={dept}
+                                        variant={selectedDepartment === dept ? "default" : "outline"}
+                                        onClick={() => setSelectedDepartment(dept)}
+                                        className={
+                                            selectedDepartment === dept
+                                                ? "bg-primary hover:bg-primary-glow text-primary-foreground shadow-glow"
+                                                : "glass border-primary/30 hover:border-primary/50"
+                                        }
+                                    >
+                                        {dept}
+                                    </Button>
+                                ))}
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center mb-8"
+                            >
+                                <p className="text-muted-foreground">
+                                    {filteredJobs.length} {filteredJobs.length === 1 ? "position" : "positions"} available
+                                </p>
+                            </motion.div>
+
+                            {filteredJobs.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                                    {filteredJobs.map((job, index) => (
+                                        <JobCard key={job.id} job={job} index={index} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-16">
+                                    <p className="text-muted-foreground text-lg">
+                                        No positions available in this department at the moment.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                </>
+            )}
 
             {/* Employee Testimonials */}
             <section className="py-16 md:py-24 bg-card/20">

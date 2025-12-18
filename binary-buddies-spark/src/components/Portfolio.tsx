@@ -1,60 +1,37 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
-
-const projects = [
-  {
-    title: "AI-Powered Healthcare Platform",
-    category: "Healthcare",
-    description: "Revolutionized patient care with predictive analytics and automated diagnosis assistance.",
-    results: ["50% faster diagnosis", "98% accuracy rate", "500+ hospitals"],
-    tags: ["AI", "Machine Learning", "Healthcare"],
-    gradient: "from-primary/20 to-accent/20",
-  },
-  {
-    title: "E-commerce Automation Suite",
-    category: "Retail",
-    description: "Complete automation solution handling inventory, orders, and customer service.",
-    results: ["70% cost reduction", "24/7 automation", "1M+ transactions/day"],
-    tags: ["Automation", "E-commerce", "RPA"],
-    gradient: "from-accent/20 to-primary/20",
-  },
-  {
-    title: "Fintech Mobile Application",
-    category: "Finance",
-    description: "Secure mobile banking solution with AI fraud detection and real-time analytics.",
-    results: ["Zero security breaches", "2M+ active users", "4.8★ rating"],
-    tags: ["Fintech", "Mobile", "Security"],
-    gradient: "from-primary/20 to-accent/20",
-  },
-  {
-    title: "IoT Manufacturing Platform",
-    category: "Manufacturing",
-    description: "Connected factory solution with predictive maintenance and real-time monitoring.",
-    results: ["40% downtime reduction", "100+ factories", "Real-time insights"],
-    tags: ["IoT", "Analytics", "Industry 4.0"],
-    gradient: "from-accent/20 to-primary/20",
-  },
-  {
-    title: "AI Content Generation Tool",
-    category: "Marketing",
-    description: "Advanced content creation platform powered by GPT-4 and custom ML models.",
-    results: ["10x content output", "95% satisfaction", "50K+ users"],
-    tags: ["AI", "NLP", "SaaS"],
-    gradient: "from-primary/20 to-accent/20",
-  },
-  {
-    title: "Smart City Dashboard",
-    category: "Government",
-    description: "Comprehensive city management system with real-time data visualization.",
-    results: ["30% efficiency gain", "500K+ citizens", "Award-winning"],
-    tags: ["Big Data", "Visualization", "Smart City"],
-    gradient: "from-accent/20 to-primary/20",
-  },
-];
+import { ExternalLink, Loader2, AlertCircle } from "lucide-react";
+import { useProjects } from "@/hooks/useProjects";
 
 export const Portfolio = () => {
+  const { data: projects, isLoading, error } = useProjects();
+
+  if (isLoading) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <AlertCircle className="h-12 w-12 text-destructive" />
+            <p className="text-lg text-muted-foreground">Failed to load projects. Please try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -73,9 +50,9 @@ export const Portfolio = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
+          {projects?.map((project, index) => (
             <motion.div
-              key={index}
+              key={project.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -89,19 +66,19 @@ export const Portfolio = () => {
                       {project.category.slice(0, 2).toUpperCase()}
                     </span>
                   </div>
-                  
+
                   <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">
                     {project.category}
                   </Badge>
-                  
+
                   <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-gradient transition-all duration-300">
                     {project.title}
                   </h3>
-                  
+
                   <p className="text-muted-foreground mb-6 leading-relaxed">
                     {project.description}
                   </p>
-                  
+
                   <div className="space-y-2 mb-6">
                     {project.results.map((result, idx) => (
                       <div key={idx} className="flex items-center gap-2 text-sm">
@@ -110,7 +87,7 @@ export const Portfolio = () => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag, idx) => (
                       <Badge key={idx} variant="outline" className="text-xs">
@@ -118,7 +95,7 @@ export const Portfolio = () => {
                       </Badge>
                     ))}
                   </div>
-                  
+
                   <div className="mt-6 flex items-center text-primary font-semibold group-hover:gap-3 gap-2 transition-all duration-300">
                     View Case Study
                     <ExternalLink className="w-4 h-4" />

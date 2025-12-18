@@ -1,54 +1,37 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Linkedin, Github, Twitter } from "lucide-react";
-
-const team = [
-  {
-    name: "Alex Rivera",
-    role: "CEO & Co-Founder",
-    specialty: "AI Strategy & Vision",
-    bio: "15+ years in AI/ML with Fortune 500 experience",
-    certifications: ["AWS Solutions Architect", "Google Cloud ML"],
-  },
-  {
-    name: "Sarah Chen",
-    role: "CTO & Co-Founder",
-    specialty: "Software Architecture",
-    bio: "Ex-Google engineer, 10+ years building scalable systems",
-    certifications: ["Kubernetes Expert", "Azure DevOps"],
-  },
-  {
-    name: "Marcus Johnson",
-    role: "Head of AI",
-    specialty: "Machine Learning & NLP",
-    bio: "PhD in Computer Science, published AI researcher",
-    certifications: ["TensorFlow Certified", "Deep Learning"],
-  },
-  {
-    name: "Elena Kovač",
-    role: "Head of Automation",
-    specialty: "RPA & Hyperautomation",
-    bio: "Automated processes for 100+ enterprise clients",
-    certifications: ["UiPath Expert", "Automation Anywhere"],
-  },
-  {
-    name: "David Park",
-    role: "Lead Developer",
-    specialty: "Full-Stack Development",
-    bio: "Built 50+ production applications across industries",
-    certifications: ["React Expert", "Node.js Certified"],
-  },
-  {
-    name: "Priya Sharma",
-    role: "Head of Product",
-    specialty: "Product Strategy & UX",
-    bio: "Launched 20+ successful SaaS products",
-    certifications: ["Product Management", "UX Design"],
-  },
-];
+import { Linkedin, Github, Twitter, Loader2, AlertCircle } from "lucide-react";
+import { useTeam } from "@/hooks/useTeam";
 
 export const Team = () => {
+  const { data: team, isLoading, error } = useTeam();
+
+  if (isLoading) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <AlertCircle className="h-12 w-12 text-destructive" />
+            <p className="text-lg text-muted-foreground">Failed to load team members. Please try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -59,17 +42,17 @@ export const Team = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
-            Meet Our <span className="text-gradient">Expert Team</span>
+            Meet Our <span className="text-gradient">Team</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Industry leaders with decades of combined experience in AI, automation, and software development
+            Industry experts passionate about transforming businesses through AI
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {team.map((member, index) => (
+          {team?.map((member, index) => (
             <motion.div
-              key={index}
+              key={member.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -77,48 +60,59 @@ export const Team = () => {
             >
               <Card className="glass hover-glow h-full group cursor-pointer transition-all duration-300 hover:scale-105">
                 <CardContent className="p-8">
-                  {/* Avatar Placeholder */}
-                  <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative overflow-hidden group-hover:scale-110 transition-transform duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 animate-pulse" />
-                    <span className="text-4xl font-bold text-gradient relative z-10">
-                      {member.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-center mb-2 text-foreground group-hover:text-gradient transition-all duration-300">
-                    {member.name}
-                  </h3>
-                  
-                  <p className="text-primary text-center font-semibold mb-2">
-                    {member.role}
-                  </p>
-                  
-                  <Badge className="w-full justify-center mb-4 bg-primary/10 text-primary border-primary/20">
-                    {member.specialty}
-                  </Badge>
-                  
-                  <p className="text-muted-foreground text-center mb-4 leading-relaxed">
-                    {member.bio}
-                  </p>
-                  
-                  <div className="space-y-2 mb-6">
-                    {member.certifications.map((cert, idx) => (
-                      <div key={idx} className="flex items-center justify-center gap-2 text-sm">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="text-foreground">{cert}</span>
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative mb-6">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-accent p-1">
+                        <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                          <span className="text-4xl font-bold text-gradient">
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  
-                  <div className="flex justify-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors">
-                      <Linkedin className="w-4 h-4 text-primary" />
+                      <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                        <span className="text-xs font-bold text-primary-foreground">✓</span>
+                      </div>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors">
-                      <Github className="w-4 h-4 text-primary" />
+
+                    <h3 className="text-2xl font-bold mb-2 group-hover:text-gradient transition-all duration-300">
+                      {member.name}
+                    </h3>
+
+                    <p className="text-primary font-semibold mb-2">{member.role}</p>
+
+                    <Badge variant="outline" className="mb-4">
+                      {member.specialty}
+                    </Badge>
+
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      {member.bio}
+                    </p>
+
+                    <div className="space-y-2 mb-6 w-full">
+                      {member.certifications.map((cert, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          <span className="text-foreground">{cert}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors">
-                      <Twitter className="w-4 h-4 text-primary" />
+
+                    <div className="flex gap-4 mt-auto">
+                      {member.linkedin_url && (
+                        <a href={member.linkedin_url} className="text-muted-foreground hover:text-primary transition-colors">
+                          <Linkedin className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.github_url && (
+                        <a href={member.github_url} className="text-muted-foreground hover:text-primary transition-colors">
+                          <Github className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.twitter_url && (
+                        <a href={member.twitter_url} className="text-muted-foreground hover:text-primary transition-colors">
+                          <Twitter className="w-5 h-5" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -128,9 +122,9 @@ export const Team = () => {
         </div>
       </div>
 
-      {/* Background Effects */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      {/* Decorative Elements */}
+      <div className="absolute top-1/4 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
     </section>
   );
 };

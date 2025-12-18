@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_bbweb_root"
+              name="Binary Buddies Web"
+              sequence="10"
+              web_icon="binary_buddies_web,static/description/icon.png"/>
+
+    <!-- Featured Projects Menu -->
+    <menuitem id="menu_bbweb_projects"
+              name="Featured Projects"
+              parent="menu_bbweb_root"
+              action="action_bbweb_featured_project"
+              sequence="10"/>
+
+    <!-- Team Members Menu -->
+    <menuitem id="menu_bbweb_team"
+              name="Team Members"
+              parent="menu_bbweb_root"
+              action="action_bbweb_team_member"
+              sequence="20"/>
+
+    <!-- Blog Posts Menu -->
+    <menuitem id="menu_bbweb_blog"
+              name="Blog Posts"
+              parent="menu_bbweb_root"
+              action="action_bbweb_blog_post"
+              sequence="30"/>
+
+    <!-- Career Listings Menu -->
+    <menuitem id="menu_bbweb_careers"
+              name="Career Listings"
+              parent="menu_bbweb_root"
+              action="action_bbweb_career"
+              sequence="40"/>
+
+    <!-- Configuration Submenu -->
+    <menuitem id="menu_bbweb_config"
+              name="Configuration"
+              parent="menu_bbweb_root"
+              sequence="100"/>
+
+    <menuitem id="menu_bbweb_project_tags"
+              name="Project Tags"
+              parent="menu_bbweb_config"
+              action="action_bbweb_project_tag"
+              sequence="10"/>
+</odoo>

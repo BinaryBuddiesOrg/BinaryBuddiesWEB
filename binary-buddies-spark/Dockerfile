@@ -15,6 +15,10 @@ RUN npm ci --silent && \
 # Copy source code
 COPY . .
 
+# Accept build argument for API URL
+ARG VITE_API_BASE_URL=http://localhost:8069
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 # Build the application with optimizations
 RUN npm run build
 

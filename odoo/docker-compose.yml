@@ -1,0 +1,39 @@
+services:
+  odoo:
+    image: odoo:18.0
+    container_name: bbweb-odoo
+    depends_on:
+      - postgres-odoo
+    network_mode: "host"
+    environment:
+      - HOST=localhost
+      - USER=odoo
+      - PASSWORD=${ODOO_DB_PASSWORD:-odoo_password}
+      - DB_NAME=bbweb_odoo
+      - DOCKER_CONTAINER=true
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./custom:/mnt/extra-addons
+    command: ["odoo", "--addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons", "--database=bbweb_odoo", "--without-demo=all", "--init=base,website", "--db_host=localhost", "--db_port=5432", "--xmlrpc-port=8069"]
+    restart: unless-stopped
+
+  # PostgreSQL for Odoo
+  postgres-odoo:
+    image: postgres:15-alpine
+    container_name: bbweb-postgres-odoo
+    network_mode: "host"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD:-odoo_password}
+    volumes:
+      - postgres_odoo_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  odoo_data:
+    driver: local
+  postgres_odoo_data:
+    driver: local
+
+# Networks removed - using host networking mode
