@@ -13,6 +13,7 @@ export interface ApiFeaturedProject {
     tags: string[];
     gradient: string;
     image: string | null; // base64 encoded
+    caseStudyUrl?: string; // URL to case study page
 }
 
 // Team Members

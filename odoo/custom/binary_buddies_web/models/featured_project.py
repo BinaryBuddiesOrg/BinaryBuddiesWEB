@@ -14,6 +14,7 @@ class FeaturedProject(models.Model):
     description = fields.Text(string='Description', required=True)
     gradient = fields.Char(string='Gradient CSS Class', default='from-primary/20 to-accent/20',
                            help='Tailwind CSS gradient classes for the card background')
+    case_study_url = fields.Char(string='Case Study URL', help='External URL to the case study page')
     
     # Image field
     image = fields.Binary(string='Project Image', attachment=True)
@@ -43,6 +44,8 @@ class FeaturedProject(models.Model):
                 'tags': [t.name for t in project.tag_ids],
                 'gradient': project.gradient,
                 'image': base64.b64encode(project.image).decode('utf-8') if project.image else None,
+                'caseStudyUrl': project.case_study_url or None,
             })
         
         return result
+

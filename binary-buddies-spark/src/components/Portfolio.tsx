@@ -58,50 +58,98 @@ export const Portfolio = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="glass hover-glow h-full group cursor-pointer transition-all duration-300 hover:scale-105">
-                <CardContent className="p-8">
-                  <div className={`h-48 rounded-lg bg-gradient-to-br ${project.gradient} mb-6 flex items-center justify-center relative overflow-hidden group-hover:scale-110 transition-transform duration-300`}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 animate-pulse" />
-                    <span className="text-5xl font-bold text-gradient relative z-10">
-                      {project.category.slice(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-
-                  <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">
-                    {project.category}
-                  </Badge>
-
-                  <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-gradient transition-all duration-300">
-                    {project.title}
-                  </h3>
-
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  <div className="space-y-2 mb-6">
-                    {project.results.map((result, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="text-foreground font-medium">{result}</span>
+              {project.caseStudyUrl ? (
+                <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="block h-full">
+                  <Card className="glass hover-glow h-full group cursor-pointer transition-all duration-300 hover:scale-105">
+                    <CardContent className="p-8">
+                      <div className={`h-48 rounded-lg bg-gradient-to-br ${project.gradient} mb-6 flex items-center justify-center relative overflow-hidden group-hover:scale-110 transition-transform duration-300`}>
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 animate-pulse" />
+                        <span className="text-5xl font-bold text-gradient relative z-10">
+                          {project.category.slice(0, 2).toUpperCase()}
+                        </span>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {tag}
+                      <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">
+                        {project.category}
                       </Badge>
-                    ))}
-                  </div>
 
-                  <div className="mt-6 flex items-center text-primary font-semibold group-hover:gap-3 gap-2 transition-all duration-300">
-                    View Case Study
-                    <ExternalLink className="w-4 h-4" />
-                  </div>
-                </CardContent>
-              </Card>
+                      <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-gradient transition-all duration-300">
+                        {project.title}
+                      </h3>
+
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        {project.description}
+                      </p>
+
+                      <div className="space-y-2 mb-6">
+                        {project.results.map((result, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-sm">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <span className="text-foreground font-medium">{result}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {project.tags.map((tag, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 flex items-center text-primary font-semibold group-hover:gap-3 gap-2 transition-all duration-300">
+                        View Case Study
+                        <ExternalLink className="w-4 h-4" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
+              ) : (
+                <Card className="glass h-full group transition-all duration-300">
+                  <CardContent className="p-8">
+                    <div className={`h-48 rounded-lg bg-gradient-to-br ${project.gradient} mb-6 flex items-center justify-center relative overflow-hidden`}>
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 animate-pulse" />
+                      <span className="text-5xl font-bold text-gradient relative z-10">
+                        {project.category.slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+
+                    <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">
+                      {project.category}
+                    </Badge>
+
+                    <h3 className="text-2xl font-bold mb-3 text-foreground">
+                      {project.title}
+                    </h3>
+
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      {project.description}
+                    </p>
+
+                    <div className="space-y-2 mb-6">
+                      {project.results.map((result, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          <span className="text-foreground font-medium">{result}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 flex items-center text-muted-foreground font-semibold gap-2">
+                      Case Study Coming Soon
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </motion.div>
           ))}
         </div>

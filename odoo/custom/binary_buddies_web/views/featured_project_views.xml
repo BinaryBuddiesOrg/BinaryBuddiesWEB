@@ -30,6 +30,7 @@
                             <field name="name" placeholder="e.g., AI-Powered Healthcare Platform"/>
                             <field name="category" placeholder="e.g., Healthcare, Retail, Finance"/>
                             <field name="gradient" placeholder="e.g., from-primary/20 to-accent/20"/>
+                            <field name="case_study_url" placeholder="e.g., https://example.com/case-study"/>
                             <field name="sequence"/>
                             <field name="active"/>
                         </group>

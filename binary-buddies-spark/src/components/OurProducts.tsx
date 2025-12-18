@@ -1,36 +1,17 @@
 import { motion } from "framer-motion";
-import { MessageSquare, BarChart, Cloud, Shield, Globe } from "lucide-react";
+import { MessageSquare, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const products = [
     {
         icon: MessageSquare,
-        title: "BB Chat",
+        title: "Chatbot",
         description: "AI-powered customer support chatbot that engages visitors 24/7 and boosts conversion rates.",
         tags: ["AI", "Chatbot", "Support"],
         color: "primary",
-    },
-    {
-        icon: BarChart,
-        title: "BB Analytics",
-        description: "Comprehensive business intelligence dashboard for real-time insights and data-driven decision making.",
-        tags: ["Analytics", "Data", "Dashboard"],
-        color: "accent",
-    },
-    {
-        icon: Cloud,
-        title: "BB Cloud",
-        description: "Secure and scalable cloud infrastructure management platform for modern enterprises.",
-        tags: ["Cloud", "Infrastructure", "DevOps"],
-        color: "primary",
-    },
-    {
-        icon: Shield,
-        title: "BB Secure",
-        description: "Advanced cybersecurity suite protecting your digital assets with enterprise-grade encryption.",
-        tags: ["Security", "Encryption", "Privacy"],
-        color: "accent",
+        link: "/products/chatbot",
     },
 ];
 
@@ -74,10 +55,10 @@ export const OurProducts = () => {
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true }}
-                    className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="flex flex-wrap justify-center gap-6"
                 >
                     {products.map((product, index) => (
-                        <motion.div key={index} variants={item} whileHover="hover">
+                        <motion.div key={index} variants={item} whileHover="hover" className="w-full max-w-sm">
                             <Card className="glass h-full flex flex-col overflow-hidden border-primary/10 hover:border-primary/30 transition-colors duration-300">
                                 <CardHeader>
                                     <div className={`w-12 h-12 rounded-lg bg-${product.color}/10 flex items-center justify-center mb-4`}>
@@ -98,10 +79,19 @@ export const OurProducts = () => {
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button variant="outline" className="w-full group">
-                                        Learn More
-                                        <Globe className="w-4 h-4 ml-2 group-hover:rotate-12 transition-transform" />
-                                    </Button>
+                                    {product.link ? (
+                                        <Button asChild variant="outline" className="w-full group">
+                                            <Link to={product.link}>
+                                                Learn More
+                                                <Globe className="w-4 h-4 ml-2 group-hover:rotate-12 transition-transform" />
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button variant="outline" className="w-full group" disabled>
+                                            Coming Soon
+                                            <Globe className="w-4 h-4 ml-2 group-hover:rotate-12 transition-transform" />
+                                        </Button>
+                                    )}
                                 </CardFooter>
                             </Card>
                         </motion.div>

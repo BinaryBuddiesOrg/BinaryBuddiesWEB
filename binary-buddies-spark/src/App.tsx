@@ -18,6 +18,7 @@ import Products from "./pages/Products";
 import Portfolio from "./pages/Portfolio";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Chatbot from "./pages/products/Chatbot";
 import CookieConsent from "./components/CookieConsent";
 import ScrollToTop from "./components/ScrollToTop";
 import BlogPost from "./pages/BlogPost";
@@ -49,6 +50,8 @@ const App = () => (
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            {/* Product Routes */}
+            <Route path="/products/chatbot" element={<Chatbot />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
