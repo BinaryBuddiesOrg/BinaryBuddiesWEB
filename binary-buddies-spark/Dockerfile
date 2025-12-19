@@ -1,54 +1,47 @@
-# Multi-stage build for optimized production image
-FROM node:18-alpine AS builder
+# Multi-stage build for optimized Next.js production image
+FROM node:18-alpine AS base
 
-# Set working directory
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
-COPY bun.lockb ./
+# Copy package files
+COPY package.json package-lock.json* ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci --silent && \
-    npm cache clean --force
+# Install dependencies
+RUN npm ci --silent
 
-# Copy source code
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Accept build argument for API URL
-ARG VITE_API_BASE_URL=http://localhost:8069
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# Set environment variables for build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
-# Build the application with optimizations
+# Build the application
 RUN npm run build
 
-# Production stage with nginx
-FROM nginx:alpine AS production
+# Production image, copy all files and run Next.js
+FROM base AS runner
+WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
-
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Set proper permissions
-RUN chown -R nextjs:nodejs /usr/share/nginx/html && \
-    chown -R nextjs:nodejs /var/cache/nginx && \
-    chown -R nextjs:nodejs /var/log/nginx && \
-    chown -R nextjs:nodejs /etc/nginx/conf.d && \
-    chmod -R 755 /usr/share/nginx/html && \
-    find /usr/share/nginx/html -type f -exec chmod 644 {} \;
+# Copy public files
+COPY --from=builder /app/public ./public
 
-# Create nginx pid directory in tmp
-RUN mkdir -p /tmp && \
-    chown -R nextjs:nodejs /tmp
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Switch to non-root user
 USER nextjs
@@ -56,12 +49,12 @@ USER nextjs
 # Expose port
 EXPOSE 6533
 
+ENV PORT=6533
+ENV HOSTNAME="0.0.0.0"
+
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:6533/ || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:6533/ || exit 1
 
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["node", "server.js"]

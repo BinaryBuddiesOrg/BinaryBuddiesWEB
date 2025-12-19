@@ -3,18 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
-      args:
-        - VITE_API_BASE_URL=http://localhost:8069
     container_name: binary-buddies-web
     network_mode: "host"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.binary-buddies.rule=Host(`localhost`)"
-      - "traefik.http.services.binary-buddies.loadbalancer.server.port=6533"
-
-# Networks removed - using host networking mode
-
