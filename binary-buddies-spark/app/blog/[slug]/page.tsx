@@ -62,10 +62,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const ogImage = post.og_image || post.image || `${SITE_URL}/logo.jpg`;
         const url = `${SITE_URL}/blog/${post.slug}`;
 
+        // Combine SEO keywords with tags for better SEO
+        const seoKeywords = post.seo_keywords?.split(',').map(k => k.trim()).filter(Boolean) || [];
+        const tagKeywords = post.tags || [];
+        const allKeywords = [...seoKeywords, ...tagKeywords].filter(Boolean);
+
         return {
             title,
             description: description.substring(0, 160), // Limit to 160 chars for SEO
-            keywords: post.seo_keywords?.split(',').map(k => k.trim()).filter(Boolean),
+            keywords: allKeywords.length > 0 ? allKeywords : undefined,
             alternates: {
                 canonical: url,
             },
@@ -237,6 +242,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                 {post.readTime}
                             </span>
                         </div>
+
+                        {/* Tags */}
+                        {post.tags && post.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {post.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-3 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary border border-primary/20"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Title - Clean without blur/glow */}
                         <h1 className="text-3xl md:text-5xl font-bold mb-8 leading-tight text-foreground">

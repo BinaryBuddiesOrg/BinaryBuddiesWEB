@@ -40,6 +40,7 @@ All endpoints are publicly accessible and return JSON data.
         'views/career_views.xml',
         'views/lead_views.xml',
         'views/job_application_views.xml',
+        'views/website_page_seo_views.xml',
         'views/menu.xml',
         'demo/demo_projects.xml',
         'demo/demo_team.xml',

@@ -72,6 +72,13 @@ class BlogPost(models.Model):
     image = fields.Binary(string='Featured Image', attachment=True)
     image_filename = fields.Char(string='Image Filename')
     
+    # Tags
+    tag_ids = fields.Many2many(
+        'bbweb.blog.tag',
+        string='Tags',
+        help='Tags for categorizing and organizing blog posts'
+    )
+    
     # Status
     featured = fields.Boolean(string='Featured Post', default=False)
     active = fields.Boolean(string='Active', default=True)
@@ -228,6 +235,7 @@ class BlogPost(models.Model):
                 'readTime': post.read_time,
                 'image': base64.b64encode(post.image).decode('utf-8') if post.image else None,
                 'featured': post.featured,
+                'tags': [t.name for t in post.tag_ids],
                 'seo_title': post.seo_title or post.title,
                 'seo_description': post.seo_description or post.excerpt,
                 'seo_keywords': post.seo_keywords or '',

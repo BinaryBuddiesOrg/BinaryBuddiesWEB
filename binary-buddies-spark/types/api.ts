@@ -46,6 +46,7 @@ export interface ApiBlogPost {
     readTime: string;
     image: string | null; // base64 encoded
     featured: boolean;
+    tags?: string[]; // Blog post tags
     seo_title?: string;
     seo_description?: string;
     seo_keywords?: string;

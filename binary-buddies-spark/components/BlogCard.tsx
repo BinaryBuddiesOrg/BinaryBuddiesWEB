@@ -65,6 +65,29 @@ export const BlogCard = ({ post, index }: BlogCardProps) => {
                             {post.excerpt}
                         </p>
 
+                        {/* Tags */}
+                        {post.tags && post.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                                    <Badge
+                                        key={tagIndex}
+                                        variant="outline"
+                                        className="text-xs px-2 py-0.5 bg-primary/5 text-primary border-primary/20"
+                                    >
+                                        {tag}
+                                    </Badge>
+                                ))}
+                                {post.tags.length > 3 && (
+                                    <Badge
+                                        variant="outline"
+                                        className="text-xs px-2 py-0.5 bg-muted text-muted-foreground"
+                                    >
+                                        +{post.tags.length - 3}
+                                    </Badge>
+                                )}
+                            </div>
+                        )}
+
                         {/* Meta Information */}
                         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-4 border-t border-primary/20">
                             <div className="flex items-center gap-2">

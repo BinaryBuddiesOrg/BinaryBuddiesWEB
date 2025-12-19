@@ -174,6 +174,7 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'readTime': blog.read_time,
                 'image': blog.image.decode('utf-8') if blog.image else None,
                 'featured': blog.featured,
+                'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
@@ -223,6 +224,7 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'readTime': blog.read_time,
                 'image': blog.image.decode('utf-8') if blog.image else None,
                 'featured': blog.featured,
+                'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
@@ -275,5 +277,38 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'responsibilities': [r.responsibility for r in career.responsibility_ids],
             }
             return self._json_response(data)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    # Website Page SEO Endpoints
+    @http.route('/api/bbweb/seo/<path:page_path>', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_page_seo(self, page_path, **kwargs):
+        """Get SEO settings for a specific page path"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            # Ensure path starts with /
+            if not page_path.startswith('/'):
+                page_path = '/' + page_path
+            
+            seo = request.env['bbweb.website.page.seo'].sudo().get_seo_by_path(page_path)
+            
+            if not seo:
+                return self._error_response('SEO settings not found for this page', status=404)
+            
+            return self._json_response(seo)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/seo', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_all_seo(self, **kwargs):
+        """Get all active SEO settings"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            seo_list = request.env['bbweb.website.page.seo'].sudo().get_all_active_seo()
+            return self._json_response(seo_list)
         except Exception as e:
             return self._error_response(str(e), status=500)

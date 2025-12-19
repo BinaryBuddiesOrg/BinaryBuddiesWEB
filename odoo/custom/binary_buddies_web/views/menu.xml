@@ -57,4 +57,16 @@
               parent="menu_bbweb_config"
               action="action_bbweb_project_tag"
               sequence="10"/>
+
+    <menuitem id="menu_bbweb_blog_tags"
+              name="Blog Tags"
+              parent="menu_bbweb_config"
+              action="action_bbweb_blog_tag"
+              sequence="20"/>
+
+    <menuitem id="menu_bbweb_website_seo"
+              name="Website Page SEO"
+              parent="menu_bbweb_config"
+              action="action_bbweb_website_page_seo"
+              sequence="30"/>
 </odoo>

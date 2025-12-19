@@ -76,7 +76,7 @@ export function generateBlogPostingSchema(post: ApiBlogPost): BlogPostingSchema 
     const url = `${SITE_URL}/blog/${post.slug}`;
     const image = post.og_image || post.image || `${SITE_URL}/logo.jpg`;
 
-    return {
+    const schema: BlogPostingSchema = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: post.title,
@@ -101,6 +101,13 @@ export function generateBlogPostingSchema(post: ApiBlogPost): BlogPostingSchema 
             '@id': url,
         },
     };
+
+    // Add keywords from tags if available
+    if (post.tags && post.tags.length > 0) {
+        (schema as any).keywords = post.tags.join(', ');
+    }
+
+    return schema;
 }
 
 export function generateOrganizationSchema(): OrganizationSchema {
