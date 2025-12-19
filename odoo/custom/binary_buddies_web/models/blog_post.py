@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 import base64
 import re
+import unicodedata
 
 
 class BlogPost(models.Model):
@@ -11,7 +12,33 @@ class BlogPost(models.Model):
     _order = 'publish_date desc, id desc'
 
     title = fields.Char(string='Title', required=True)
+    slug = fields.Char(
+        string='Slug',
+        required=True,
+        index=True,
+        help='URL-friendly version of the title (auto-generated)'
+    )
     excerpt = fields.Text(string='Excerpt', required=True, help='Short summary of the blog post')
+    
+    # SEO fields
+    seo_title = fields.Char(
+        string='SEO Title',
+        help='Custom title for search engines (defaults to title if not set)'
+    )
+    seo_description = fields.Text(
+        string='SEO Description',
+        help='Meta description for search engines (defaults to excerpt if not set)'
+    )
+    seo_keywords = fields.Char(
+        string='SEO Keywords',
+        help='Comma-separated keywords for SEO'
+    )
+    og_image = fields.Binary(
+        string='Open Graph Image',
+        attachment=True,
+        help='Image for social media sharing (defaults to featured image if not set)'
+    )
+    og_image_filename = fields.Char(string='OG Image Filename')
     # Completely disable sanitization to allow iframe embeds (YouTube, Vimeo, etc.)
     # Note: Only trusted admin users should edit blog content
     content = fields.Html(
@@ -48,6 +75,82 @@ class BlogPost(models.Model):
     # Status
     featured = fields.Boolean(string='Featured Post', default=False)
     active = fields.Boolean(string='Active', default=True)
+    
+    _sql_constraints = [
+        ('slug_unique', 'UNIQUE(slug)', 'The slug must be unique!'),
+    ]
+    
+    def _slugify(self, text):
+        """
+        Convert text to a URL-friendly slug.
+        - Lowercase
+        - Replace spaces and special chars with hyphens
+        - Remove non-alphanumeric except hyphens
+        - Limit length
+        """
+        if not text:
+            return ''
+        
+        # Normalize unicode characters (e.g., é -> e)
+        text = unicodedata.normalize('NFKD', text)
+        text = text.encode('ascii', 'ignore').decode('ascii')
+        
+        # Convert to lowercase and replace spaces/special chars with hyphens
+        text = re.sub(r'[^\w\s-]', '', text.lower())
+        text = re.sub(r'[-\s]+', '-', text)
+        text = text.strip('-')
+        
+        # Limit length to 100 characters
+        if len(text) > 100:
+            text = text[:100].rstrip('-')
+        
+        return text
+    
+    def _generate_unique_slug(self, base_slug, exclude_id=None):
+        """Generate a unique slug by appending a number if needed"""
+        slug = base_slug
+        counter = 1
+        
+        while True:
+            domain = [('slug', '=', slug)]
+            if exclude_id:
+                domain.append(('id', '!=', exclude_id))
+            
+            existing = self.search(domain, limit=1)
+            if not existing:
+                return slug
+            
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+    
+    @api.model
+    def create(self, vals):
+        """Auto-generate slug if not provided"""
+        if 'slug' not in vals or not vals.get('slug'):
+            if 'title' in vals and vals.get('title'):
+                base_slug = self._slugify(vals['title'])
+                vals['slug'] = self._generate_unique_slug(base_slug)
+        elif vals.get('slug'):
+            # Ensure slug is properly formatted
+            base_slug = self._slugify(vals['slug'])
+            vals['slug'] = self._generate_unique_slug(base_slug)
+        
+        return super(BlogPost, self).create(vals)
+    
+    def write(self, vals):
+        """Update slug if title changes"""
+        for record in self:
+            if 'title' in vals and vals.get('title') != record.title:
+                # Only auto-update slug if it wasn't manually changed
+                if 'slug' not in vals:
+                    base_slug = self._slugify(vals['title'])
+                    vals['slug'] = self._generate_unique_slug(base_slug, exclude_id=record.id)
+            elif 'slug' in vals and vals.get('slug'):
+                # Ensure slug is properly formatted
+                base_slug = self._slugify(vals['slug'])
+                vals['slug'] = self._generate_unique_slug(base_slug, exclude_id=record.id)
+        
+        return super(BlogPost, self).write(vals)
     
     def _get_base_url(self):
         """Get the base URL for the Odoo instance"""
@@ -113,6 +216,7 @@ class BlogPost(models.Model):
             result.append({
                 'id': str(post.id),
                 'title': post.title,
+                'slug': post.slug,
                 'excerpt': post.excerpt,
                 'content': processed_content,
                 'category': category_map.get(post.category, post.category),
@@ -124,6 +228,10 @@ class BlogPost(models.Model):
                 'readTime': post.read_time,
                 'image': base64.b64encode(post.image).decode('utf-8') if post.image else None,
                 'featured': post.featured,
+                'seo_title': post.seo_title or post.title,
+                'seo_description': post.seo_description or post.excerpt,
+                'seo_keywords': post.seo_keywords or '',
+                'og_image': base64.b64encode(post.og_image).decode('utf-8') if post.og_image else (base64.b64encode(post.image).decode('utf-8') if post.image else None),
             })
         
         return result

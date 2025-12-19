@@ -1,6 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
+import { generateServiceSchema } from "@/lib/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Code2,
@@ -79,8 +81,14 @@ const benefits = [
 ];
 
 export default function SoftwareDevelopment() {
+  const serviceSchema = generateServiceSchema(
+    'Software Development',
+    'Custom software development solutions including enterprise applications, cloud solutions, microservices, and scalable software architecture.'
+  );
+
   return (
     <div className="relative min-h-screen">
+      <SchemaMarkup schema={serviceSchema} />
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />

@@ -1,5 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
+import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
+import { generateProductSchema } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -107,8 +109,15 @@ const demoImages = [
 ];
 
 export default function Chatbot() {
+    const productSchema = generateProductSchema(
+        'AI Chatbot',
+        'Integrate a powerful AI chatbot into any website in just 2 minutes. Boost conversions, automate support, and delight customers 24/7.',
+        '/images/chatbot/hero.png'
+    );
+
     return (
         <div className="relative min-h-screen">
+            <SchemaMarkup schema={productSchema} />
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-hero opacity-50" />
@@ -160,6 +169,8 @@ export default function Chatbot() {
                                     src="/images/chatbot/hero.png"
                                     alt="Chatbot Dashboard Preview"
                                     className="w-full h-auto"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
                             </div>
@@ -277,6 +288,8 @@ export default function Chatbot() {
                                             src={image.src}
                                             alt={image.title}
                                             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     </div>
                                     <div className="p-6">

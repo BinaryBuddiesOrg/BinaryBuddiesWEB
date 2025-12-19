@@ -6,6 +6,8 @@ import { Navbar } from '@/components/Navbar';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import CookieConsent from '@/components/CookieConsent';
+import { SchemaMarkup } from '@/components/SEO/SchemaMarkup';
+import { generateOrganizationSchema } from '@/lib/schema';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,6 +17,8 @@ export const metadata: Metadata = {
     keywords: ['software development', 'AI', 'machine learning', 'web development', 'mobile apps'],
 };
 
+const organizationSchema = generateOrganizationSchema();
+
 export default function RootLayout({
     children,
 }: {
@@ -23,6 +27,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
+                <SchemaMarkup schema={organizationSchema} />
                 <Providers>
                     <Navbar />
                     {children}

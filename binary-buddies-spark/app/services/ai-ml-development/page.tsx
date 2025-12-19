@@ -1,6 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
+import { generateServiceSchema } from "@/lib/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Brain,
@@ -125,8 +127,14 @@ const stats = [
 ];
 
 export default function AIMLDevelopment() {
+  const serviceSchema = generateServiceSchema(
+    'AI & ML Development',
+    'Cutting-edge AI and machine learning solutions including chatbots, computer vision, NLP, predictive analytics, and custom AI models.'
+  );
+
   return (
     <div className="relative min-h-screen">
+      <SchemaMarkup schema={serviceSchema} />
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />

@@ -3,8 +3,12 @@
  * Centralized configuration for all API endpoints
  */
 
-// Use relative paths so requests go through Nginx proxy
-// This avoids CORS issues as Nginx forwards to Odoo
+// Determine API base URL based on environment
+// During build time, we need absolute URLs
+// At runtime, we use relative URLs (via Next.js rewrites to Odoo)
+// 
+// Strategy: Always use relative URLs. The ensureAbsoluteUrl function
+// in services/api.ts will convert to absolute only during actual build.
 const API_BASE_URL = '';
 
 // API endpoint paths
@@ -21,6 +25,7 @@ export const API_ENDPOINTS = {
     blogs: `${API_BASE_URL}/api/bbweb/blogs`,
     blogsFeatured: `${API_BASE_URL}/api/bbweb/blogs/featured`,
     blog: (id: number) => `${API_BASE_URL}/api/bbweb/blogs/${id}`,
+    blogBySlug: (slug: string) => `${API_BASE_URL}/api/bbweb/blogs/slug/${slug}`,
 
     // Careers
     careers: `${API_BASE_URL}/api/bbweb/careers`,

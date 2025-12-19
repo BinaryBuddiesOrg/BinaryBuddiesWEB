@@ -3,8 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - ODOO_API_URL=${ODOO_API_URL:-http://localhost:8069}
     container_name: binary-buddies-web
     network_mode: "host"
     environment:
       - NODE_ENV=production
+      - ODOO_API_URL=${ODOO_API_URL:-http://localhost:8069}
     restart: unless-stopped

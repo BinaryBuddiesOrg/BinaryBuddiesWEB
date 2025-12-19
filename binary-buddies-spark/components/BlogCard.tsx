@@ -26,7 +26,7 @@ export const BlogCard = ({ post, index }: BlogCardProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
         >
-            <Link href={`/blog/${post.id}`} className="block h-full">
+            <Link href={`/blog/${post.slug}`} className="block h-full">
                 <Card className="glass hover-glow overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300">
                     {/* Image Placeholder with Gradient */}
                     <div className="relative h-48 bg-gradient-to-br from-primary/20 via-accent/20 to-accent-pink/20 overflow-hidden">

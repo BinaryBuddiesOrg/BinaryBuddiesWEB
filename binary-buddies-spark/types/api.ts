@@ -33,6 +33,7 @@ export interface ApiTeamMember {
 // Blog Posts
 export interface ApiBlogPost {
     id: string;
+    slug: string;
     title: string;
     excerpt: string;
     content: string;
@@ -45,6 +46,10 @@ export interface ApiBlogPost {
     readTime: string;
     image: string | null; // base64 encoded
     featured: boolean;
+    seo_title?: string;
+    seo_description?: string;
+    seo_keywords?: string;
+    og_image?: string | null; // base64 encoded
 }
 
 // Careers

@@ -162,6 +162,7 @@ class BinaryBuddiesWebAPI(http.Controller):
             data = {
                 'id': str(blog.id),
                 'title': blog.title,
+                'slug': blog.slug,
                 'excerpt': blog.excerpt,
                 'content': processed_content,
                 'category': category_map.get(blog.category, blog.category),
@@ -173,6 +174,59 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'readTime': blog.read_time,
                 'image': blog.image.decode('utf-8') if blog.image else None,
                 'featured': blog.featured,
+                'seo_title': blog.seo_title or blog.title,
+                'seo_description': blog.seo_description or blog.excerpt,
+                'seo_keywords': blog.seo_keywords or '',
+                'og_image': blog.og_image.decode('utf-8') if blog.og_image else (blog.image.decode('utf-8') if blog.image else None),
+            }
+            return self._json_response(data)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/blogs/slug/<slug>', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_by_slug(self, slug, **kwargs):
+        """Get a single blog post by slug"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            blog = request.env['bbweb.blog.post'].sudo().search([
+                ('slug', '=', slug),
+                ('active', '=', True)
+            ], limit=1)
+            
+            if not blog:
+                return self._error_response('Blog post not found', status=404)
+            
+            category_map = {
+                'ai_ml': 'AI/ML',
+                'automation': 'Automation',
+                'development': 'Development',
+                'industry_news': 'Industry News',
+            }
+            
+            # Process content to fix relative URLs for images
+            processed_content = blog._process_html_content(blog.content)
+            
+            data = {
+                'id': str(blog.id),
+                'title': blog.title,
+                'slug': blog.slug,
+                'excerpt': blog.excerpt,
+                'content': processed_content,
+                'category': category_map.get(blog.category, blog.category),
+                'author': {
+                    'name': blog.author_name,
+                    'avatar': blog.author_avatar or blog.author_name[:2].upper(),
+                },
+                'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
+                'readTime': blog.read_time,
+                'image': blog.image.decode('utf-8') if blog.image else None,
+                'featured': blog.featured,
+                'seo_title': blog.seo_title or blog.title,
+                'seo_description': blog.seo_description or blog.excerpt,
+                'seo_keywords': blog.seo_keywords or '',
+                'og_image': blog.og_image.decode('utf-8') if blog.og_image else (blog.image.decode('utf-8') if blog.image else None),
             }
             return self._json_response(data)
         except Exception as e:

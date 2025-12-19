@@ -1,6 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
+import { generateServiceSchema } from "@/lib/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Smartphone,
@@ -112,8 +114,14 @@ const benefits = [
 ];
 
 export default function AppDevelopment() {
+  const serviceSchema = generateServiceSchema(
+    'Mobile App Development',
+    'Professional mobile app development for iOS and Android. Native and cross-platform apps using React Native, Flutter, Swift, and Kotlin.'
+  );
+
   return (
     <div className="relative min-h-screen">
+      <SchemaMarkup schema={serviceSchema} />
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-50" />

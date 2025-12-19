@@ -18,9 +18,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Accept build argument for API URL
+ARG ODOO_API_URL=http://localhost:8069
+
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV ODOO_API_URL=${ODOO_API_URL}
 
 # Build the application
 RUN npm run build
