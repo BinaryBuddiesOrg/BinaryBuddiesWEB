@@ -178,11 +178,11 @@ export default function BlogPage() {
                                         key={category}
                                         variant={selectedCategory === category ? "default" : "outline"}
                                         onClick={() => setSelectedCategory(category)}
-                                        className={`glass ${
+                                        className={
                                             selectedCategory === category
-                                                ? "bg-primary text-white hover:bg-primary/90 border-primary/50"
-                                                : ""
-                                        }`}
+                                                ? "bg-primary text-white hover:bg-primary/90 border-primary/50 shadow-sm"
+                                                : "glass"
+                                        }
                                     >
                                         {category}
                                     </Button>
