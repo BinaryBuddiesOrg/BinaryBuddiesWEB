@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-import base64
 import re
 import unicodedata
 
@@ -69,7 +68,11 @@ class BlogPost(models.Model):
     read_time = fields.Char(string='Read Time', default='5 min read', help='e.g., "8 min read"')
     
     # Image field
-    image = fields.Binary(string='Featured Image', attachment=True)
+    image = fields.Binary(
+        string='Preview Image',
+        attachment=True,
+        help='Preview image displayed in blog listing page. Recommended size: 800x400px. If not set, a placeholder will be shown.'
+    )
     image_filename = fields.Char(string='Image Filename')
     
     # Tags
@@ -220,6 +223,11 @@ class BlogPost(models.Model):
             # Process content to fix relative URLs
             processed_content = post._process_html_content(post.content)
             
+            # Note: Odoo Binary fields already store data as base64 string
+            # We just need to decode bytes to string, NOT re-encode
+            image_data = post.image.decode('utf-8') if post.image else None
+            og_image_data = post.og_image.decode('utf-8') if post.og_image else image_data
+            
             result.append({
                 'id': str(post.id),
                 'title': post.title,
@@ -233,13 +241,13 @@ class BlogPost(models.Model):
                 },
                 'date': post.publish_date.strftime('%Y-%m-%d') if post.publish_date else '',
                 'readTime': post.read_time,
-                'image': base64.b64encode(post.image).decode('utf-8') if post.image else None,
+                'image': image_data,
                 'featured': post.featured,
                 'tags': [t.name for t in post.tag_ids],
                 'seo_title': post.seo_title or post.title,
                 'seo_description': post.seo_description or post.excerpt,
                 'seo_keywords': post.seo_keywords or '',
-                'og_image': base64.b64encode(post.og_image).decode('utf-8') if post.og_image else (base64.b64encode(post.image).decode('utf-8') if post.image else None),
+                'og_image': og_image_data,
             })
         
         return result

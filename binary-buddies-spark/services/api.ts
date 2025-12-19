@@ -199,10 +199,24 @@ export async function fetchBlogs(options?: FetchBlogsOptions & { skipError?: boo
     const data = await fetchApi<ApiBlogPost[]>(url, { skipError: options?.skipError });
 
     // Transform base64 images to data URLs
-    return data.map(post => ({
-        ...post,
-        image: base64ToDataUrl(post.image),
-    }));
+    return data.map(post => {
+        const convertedImage = base64ToDataUrl(post.image);
+        
+        // Debug logging (only in development)
+        if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+            if (post.image && !convertedImage) {
+                console.warn(`[fetchBlogs] Failed to convert image for post "${post.title}":`, {
+                    originalLength: post.image?.length,
+                    originalPreview: post.image?.substring(0, 50),
+                });
+            }
+        }
+        
+        return {
+            ...post,
+            image: convertedImage,
+        };
+    });
 }
 
 export async function fetchBlog(id: number): Promise<ApiBlogPost> {

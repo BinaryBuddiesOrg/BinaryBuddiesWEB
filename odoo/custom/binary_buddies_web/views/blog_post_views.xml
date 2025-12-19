@@ -5,7 +5,8 @@
         <field name="name">bbweb.blog.post.tree</field>
         <field name="model">bbweb.blog.post</field>
         <field name="arch" type="xml">
-            <list string="Blog Posts">
+            <list string="Blog Posts" default_order="publish_date desc">
+                <field name="image" widget="image" class="oe_avatar" options="{'size': [50, 50]}"/>
                 <field name="publish_date"/>
                 <field name="title"/>
                 <field name="slug"/>
@@ -28,7 +29,17 @@
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
                         <widget name="web_ribbon" title="Featured" bg_color="bg-success" invisible="not featured"/>
                     </div>
-                    <field name="image" widget="image" class="oe_avatar"/>
+                    <!-- Preview Image Section - Prominent -->
+                    <group string="Preview Image (for Blog Listing)">
+                        <field name="image" widget="image" options="{'preview_image': 'image', 'size': [800, 400]}" nolabel="1"/>
+                        <field name="image_filename" invisible="1"/>
+                        <div class="alert alert-info mt-2" role="alert">
+                            <strong>📸 Preview Image:</strong> This image appears in the blog listing page.<br/>
+                            <strong>Recommended:</strong> 800x400px (16:9 ratio) | JPG/PNG/WebP | Max 5MB<br/>
+                            <em>💡 Tip: If no image is set, a placeholder will be shown on the website.</em>
+                        </div>
+                    </group>
+                    
                     <group>
                         <group>
                             <field name="title" placeholder="Blog post title..."/>
@@ -42,7 +53,6 @@
                             <field name="author_avatar" placeholder="e.g., SC"/>
                             <field name="featured"/>
                             <field name="active"/>
-                            <field name="image_filename" invisible="1"/>
                         </group>
                     </group>
                     <group>

@@ -159,6 +159,11 @@ class BinaryBuddiesWebAPI(http.Controller):
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
+            # Note: Odoo Binary fields already store data as base64 string
+            # We just need to decode bytes to string, NOT re-encode
+            image_data = blog.image.decode('utf-8') if blog.image else None
+            og_image_data = blog.og_image.decode('utf-8') if blog.og_image else image_data
+            
             data = {
                 'id': str(blog.id),
                 'title': blog.title,
@@ -172,13 +177,13 @@ class BinaryBuddiesWebAPI(http.Controller):
                 },
                 'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
                 'readTime': blog.read_time,
-                'image': blog.image.decode('utf-8') if blog.image else None,
+                'image': image_data,
                 'featured': blog.featured,
                 'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
-                'og_image': blog.og_image.decode('utf-8') if blog.og_image else (blog.image.decode('utf-8') if blog.image else None),
+                'og_image': og_image_data,
             }
             return self._json_response(data)
         except Exception as e:
@@ -209,6 +214,11 @@ class BinaryBuddiesWebAPI(http.Controller):
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
+            # Note: Odoo Binary fields already store data as base64 string
+            # We just need to decode bytes to string, NOT re-encode
+            image_data = blog.image.decode('utf-8') if blog.image else None
+            og_image_data = blog.og_image.decode('utf-8') if blog.og_image else image_data
+            
             data = {
                 'id': str(blog.id),
                 'title': blog.title,
@@ -222,13 +232,13 @@ class BinaryBuddiesWebAPI(http.Controller):
                 },
                 'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
                 'readTime': blog.read_time,
-                'image': blog.image.decode('utf-8') if blog.image else None,
+                'image': image_data,
                 'featured': blog.featured,
                 'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
-                'og_image': blog.og_image.decode('utf-8') if blog.og_image else (blog.image.decode('utf-8') if blog.image else None),
+                'og_image': og_image_data,
             }
             return self._json_response(data)
         except Exception as e:

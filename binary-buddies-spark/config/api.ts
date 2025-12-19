@@ -54,8 +54,62 @@ export const buildUrl = (url: string, params?: Record<string, string>): string =
     return `${url}?${queryString}`;
 };
 
+// Helper to detect image MIME type from base64 string
+const detectImageMimeType = (base64: string): string => {
+    // Check base64 signature to determine image type
+    // JPEG: /9j/4AAQSkZJRg... or /9j/
+    // PNG: iVBORw0KGgoAAAANSUhEUgAA...
+    // WebP: UklGR...
+    const trimmed = base64.trim();
+    
+    if (trimmed.startsWith('/9j/') || trimmed.startsWith('/9j/4AAQ')) {
+        return 'image/jpeg';
+    }
+    if (trimmed.startsWith('iVBORw0KGgo')) {
+        return 'image/png';
+    }
+    if (trimmed.startsWith('UklGR')) {
+        return 'image/webp';
+    }
+    // Default to PNG if can't detect
+    return 'image/png';
+};
+
 // Helper to convert base64 image to data URL
-export const base64ToDataUrl = (base64: string | null, mimeType = 'image/png'): string | null => {
-    if (!base64) return null;
-    return `data:${mimeType};base64,${base64}`;
+export const base64ToDataUrl = (base64: string | null, mimeType?: string): string | null => {
+    // Handle null/undefined/empty
+    if (!base64 || typeof base64 !== 'string') {
+        return null;
+    }
+    
+    // Remove any whitespace
+    const cleanBase64 = base64.trim();
+    
+    // Check if empty after trimming
+    if (cleanBase64 === '') {
+        return null;
+    }
+    
+    // Check if it's already a data URL
+    if (cleanBase64.startsWith('data:')) {
+        return cleanBase64;
+    }
+    
+    // Auto-detect MIME type if not provided
+    const detectedMimeType = mimeType || detectImageMimeType(cleanBase64);
+    
+    // Convert base64 to data URL
+    const dataUrl = `data:${detectedMimeType};base64,${cleanBase64}`;
+    
+    // Debug logging (only in development)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+        if (cleanBase64.length < 100) {
+            console.warn('[base64ToDataUrl] Very short base64 string:', {
+                length: cleanBase64.length,
+                preview: cleanBase64.substring(0, 50),
+            });
+        }
+    }
+    
+    return dataUrl;
 };
