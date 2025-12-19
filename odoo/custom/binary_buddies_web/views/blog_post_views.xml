@@ -84,8 +84,13 @@
                                     <field name="seo_keywords" placeholder="Comma-separated keywords (e.g., AI, machine learning, automation)"/>
                                 </group>
                                 <group string="Social Media">
-                                    <field name="og_image" widget="image" options="{'preview_image': 'image', 'size': [1024, 1024]}"/>
+                                    <field name="og_image" widget="image" options="{'size': [400, 400]}" nolabel="1"/>
                                     <field name="og_image_filename" invisible="1"/>
+                                    <div class="alert alert-info mt-2" role="alert">
+                                        <strong>📱 Open Graph Image:</strong> Image shown when sharing on social media (Facebook, Twitter, LinkedIn).<br/>
+                                        <strong>Recommended:</strong> 1200x630px (1.91:1 ratio) | JPG/PNG | Max 5MB<br/>
+                                        <em>💡 Tip: If not set, the preview image will be used automatically.</em>
+                                    </div>
                                 </group>
                             </group>
                         </page>
