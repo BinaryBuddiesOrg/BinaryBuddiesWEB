@@ -1,73 +1,67 @@
-# Welcome to your Lovable project
+# Binary Buddies Web Application
 
-## Project info
+## Project Overview
 
-**URL**: https://lovable.dev/projects/c28aea53-6284-45b6-b085-f33504c94fee
+This is the frontend web application for Binary Buddies, built with Next.js, TypeScript, and Tailwind CSS.
 
-## How can I edit this code?
+## Getting Started
 
-There are several ways of editing your application.
+### Prerequisites
 
-**Use Lovable**
+- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c28aea53-6284-45b6-b085-f33504c94fee) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd binary-buddies-spark
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Step 3: Install the necessary dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The development server will start on `http://localhost:3000` with hot-reloading enabled.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technologies Used
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Next.js 15** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **shadcn-ui** - UI components
+- **TanStack Query** - Data fetching
+- **Framer Motion** - Animations
 
-## How can I deploy this project?
+## Building for Production
 
-Simply open [Lovable](https://lovable.dev/projects/c28aea53-6284-45b6-b085-f33504c94fee) and click on Share -> Publish.
+```sh
+npm run build
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Docker Deployment
 
-Yes, you can!
+The application can be deployed using Docker:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```sh
+docker compose up -d
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Project Structure
+
+- `/app` - Next.js app router pages
+- `/components` - React components
+- `/hooks` - Custom React hooks
+- `/services` - API services
+- `/types` - TypeScript type definitions
+- `/lib` - Utility functions

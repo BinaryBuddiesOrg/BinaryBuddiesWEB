@@ -78,7 +78,7 @@ export const Navbar = () => {
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.3 }}
             >
-              <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
+              <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full" />
             </motion.div>
             <span className="text-xl md:text-2xl font-bold text-foreground">
               Binary Buddies
@@ -223,7 +223,7 @@ export const Navbar = () => {
                 <div className="flex flex-col h-full">
                   {/* Mobile Logo */}
                   <div className="flex items-center gap-2 mb-8 pt-4">
-                    <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain" />
+                    <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain rounded-full" />
                     <span className="text-xl font-bold text-foreground">
                       Binary Buddies
                     </span>

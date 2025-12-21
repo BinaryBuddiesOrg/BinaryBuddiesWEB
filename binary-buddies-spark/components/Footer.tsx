@@ -9,7 +9,7 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain" />
+              <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain rounded-full" />
               <h3 className="text-2xl font-bold text-foreground">Binary Buddies</h3>
             </div>
             <p className="text-muted-foreground">
