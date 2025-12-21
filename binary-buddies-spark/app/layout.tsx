@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Lexend } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Navbar } from '@/components/Navbar';
@@ -10,6 +10,10 @@ import { SchemaMarkup } from '@/components/SEO/SchemaMarkup';
 import { generateOrganizationSchema } from '@/lib/schema';
 
 const inter = Inter({ subsets: ['latin'] });
+const lexend = Lexend({ 
+    subsets: ['latin'],
+    variable: '--font-lexend',
+});
 
 export const metadata: Metadata = {
     title: 'Binary Buddies - AI & Software Solutions',
@@ -26,7 +30,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={inter.className}>
+            <body className={`${inter.className} ${lexend.variable}`}>
                 <SchemaMarkup schema={organizationSchema} />
                 <Providers>
                     <Navbar />

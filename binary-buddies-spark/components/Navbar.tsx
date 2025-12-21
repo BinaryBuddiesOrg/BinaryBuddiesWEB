@@ -80,7 +80,7 @@ export const Navbar = () => {
             >
               <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full" />
             </motion.div>
-            <span className="text-xl md:text-2xl font-bold text-foreground">
+            <span className="text-xl md:text-2xl font-bold text-foreground font-lexend tracking-wider">
               Binary Buddies
             </span>
           </Link>
@@ -224,7 +224,7 @@ export const Navbar = () => {
                   {/* Mobile Logo */}
                   <div className="flex items-center gap-2 mb-8 pt-4">
                     <img src="/logo.jpg" alt="Binary Buddies Logo" className="w-8 h-8 object-contain rounded-full" />
-                    <span className="text-xl font-bold text-foreground">
+                    <span className="text-xl font-bold text-foreground font-lexend tracking-wider">
                       Binary Buddies
                     </span>
                   </div>
