@@ -19,6 +19,11 @@ export const metadata: Metadata = {
     title: 'Binary Buddies - AI & Software Solutions',
     description: 'Expert software development, AI/ML solutions, web and mobile app development.',
     keywords: ['software development', 'AI', 'machine learning', 'web development', 'mobile apps'],
+    icons: {
+        icon: '/logo.jpg',
+        shortcut: '/logo.jpg',
+        apple: '/logo.jpg',
+    },
 };
 
 const organizationSchema = generateOrganizationSchema();
