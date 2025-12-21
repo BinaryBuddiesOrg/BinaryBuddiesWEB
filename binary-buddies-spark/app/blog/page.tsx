@@ -1,83 +1,95 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, Loader2, AlertCircle } from "lucide-react";
+import { Search, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { BlogCard } from "@/components/BlogCard";
+import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { Footer } from "@/components/Footer";
 import { categories } from "@/data/blogData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useInfiniteBlogs, useFeaturedBlogs } from "@/hooks/useBlogs";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { useBlogs } from "@/hooks/useBlogs";
 import type { ApiBlogPost } from "@/types/api";
 import type { PaginatedBlogResponse } from "@/services/api";
+
+const POSTS_PER_PAGE = 12;
 
 export default function BlogPage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
-    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    // Fetch blogs with infinite scroll
+    // Reset to page 1 when category or search changes
     const categoryFilter = selectedCategory !== "All" ? selectedCategory : undefined;
+    
+    // Fetch blogs with pagination
     const {
-        data: infiniteData,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
+        data: blogsData,
         isLoading,
         error,
-    } = useInfiniteBlogs({
+    } = useBlogs({
         category: categoryFilter,
-        limit: 12, // Load 12 blogs per page
+        page: currentPage,
+        limit: POSTS_PER_PAGE,
     });
 
-    const { data: featuredPostsData } = useFeaturedBlogs();
-    
-    // Extract featured posts (handle both array and paginated response)
-    const featuredPosts = useMemo(() => {
-        if (!featuredPostsData) return [];
-        if (Array.isArray(featuredPostsData)) return featuredPostsData;
-        return featuredPostsData.data || [];
-    }, [featuredPostsData]);
 
-    // Flatten all pages of blog posts
-    const allPosts = useMemo(() => {
-        if (!infiniteData?.pages) return [];
-        return (infiniteData.pages as PaginatedBlogResponse[]).flatMap((page) => page.data);
-    }, [infiniteData]);
+    // Extract blog posts and pagination info
+    const { posts, pagination } = useMemo(() => {
+        if (!blogsData) {
+            return { posts: [], pagination: null };
+        }
+        
+        if (Array.isArray(blogsData)) {
+            // Legacy format - no pagination
+            return { posts: blogsData, pagination: null };
+        }
+        
+        // Paginated format
+        return {
+            posts: blogsData.data || [],
+            pagination: blogsData.pagination || null,
+        };
+    }, [blogsData]);
 
-    // Client-side search filtering
+    // Client-side search filtering (only if not using pagination)
     const filteredPosts = useMemo(() => {
-        if (!searchQuery.trim()) return allPosts;
-        return allPosts.filter((post) => {
+        if (!searchQuery.trim()) return posts;
+        return posts.filter((post) => {
             const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesSearch;
         });
-    }, [allPosts, searchQuery]);
+    }, [posts, searchQuery]);
 
-    // Intersection Observer for infinite scroll
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !searchQuery) {
-                    fetchNextPage();
-                }
-            },
-            { threshold: 0.1 }
-        );
+    // Calculate total pages
+    const totalPages = pagination 
+        ? Math.ceil(pagination.total / (pagination.limit || POSTS_PER_PAGE))
+        : 1;
 
-        const currentRef = loadMoreRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage, searchQuery]);
+    // Reset page when category or search changes
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
+        setCurrentPage(1);
+    };
+
+    const handleSearchChange = (query: string) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
 
     return (
         <div className="relative">
@@ -159,7 +171,7 @@ export default function BlogPage() {
                                 type="text"
                                 placeholder="Search articles..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => handleSearchChange(e.target.value)}
                                 className="pl-12 h-14 text-lg glass border-primary/20 focus:border-primary"
                             />
                         </div>
@@ -167,11 +179,19 @@ export default function BlogPage() {
                 </div>
             </section>
 
-            {/* Loading State */}
+            {/* Loading State - Show Skeletons */}
             {isLoading && (
                 <section className="container mx-auto px-4 py-16">
-                    <div className="flex items-center justify-center min-h-[400px]">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center mb-12">
+                            <div className="h-8 w-48 bg-muted/50 rounded-md animate-pulse mx-auto mb-4" />
+                            <div className="h-4 w-32 bg-muted/30 rounded-md animate-pulse mx-auto" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[...Array(POSTS_PER_PAGE)].map((_, i) => (
+                                <BlogCardSkeleton key={i} />
+                            ))}
+                        </div>
                     </div>
                 </section>
             )}
@@ -186,38 +206,9 @@ export default function BlogPage() {
                 </section>
             )}
 
-            {/* Content - Only show when not loading and no error */}
+            {/* Content - Show when not loading and no error */}
             {!isLoading && !error && (
-                <>
-                    {/* Featured Posts */}
-                    {featuredPosts && featuredPosts.length > 0 && selectedCategory === "All" && searchQuery === "" && (
-                        <section className="container mx-auto px-4 py-16">
-                            <div className="max-w-7xl mx-auto">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-12"
-                                >
-                                    <h2 className="text-4xl font-bold mb-4">
-                                        Featured <span className="text-gradient">Articles</span>
-                                    </h2>
-                                    <p className="text-muted-foreground text-lg">
-                                        Our most popular and impactful content
-                                    </p>
-                                </motion.div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {featuredPosts.map((post, index) => (
-                                        <BlogCard key={post.id} post={post} index={index} />
-                                    ))}
-                                </div>
-                            </div>
-                        </section>
-                    )}
-
-                    {/* All Posts */}
-                    <section className="py-16 md:py-24">
+                <section className="py-16 md:py-24">
                         <div className="container mx-auto px-4">
                             {/* Category Filter */}
                             <motion.div
@@ -230,7 +221,7 @@ export default function BlogPage() {
                                     <Button
                                         key={category}
                                         variant={selectedCategory === category ? "default" : "outline"}
-                                        onClick={() => setSelectedCategory(category)}
+                                        onClick={() => handleCategoryChange(category)}
                                         className={
                                             selectedCategory === category
                                                 ? "bg-primary text-white hover:bg-primary/90 border-primary/50 shadow-sm"
@@ -250,9 +241,9 @@ export default function BlogPage() {
                                 <p className="text-muted-foreground">
                                     {searchQuery 
                                         ? `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"} found`
-                                        : infiniteData?.pages && (infiniteData.pages as PaginatedBlogResponse[])[0]?.pagination?.total 
-                                            ? `${(infiniteData.pages as PaginatedBlogResponse[])[0].pagination.total} total ${(infiniteData.pages as PaginatedBlogResponse[])[0].pagination.total === 1 ? "article" : "articles"}`
-                                            : `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"}`
+                                        : pagination
+                                            ? `Showing ${posts.length} of ${pagination.total} ${pagination.total === 1 ? "article" : "articles"} (Page ${currentPage} of ${totalPages})`
+                                            : `${posts.length} ${posts.length === 1 ? "article" : "articles"}`
                                     }
                                 </p>
                             </motion.div>
@@ -265,17 +256,111 @@ export default function BlogPage() {
                                         ))}
                                     </div>
                                     
-                                    {/* Infinite scroll trigger - only show when not searching */}
-                                    {!searchQuery && (
-                                        <div ref={loadMoreRef} className="mt-12 flex justify-center">
-                                            {isFetchingNextPage && (
-                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                            )}
-                                            {!hasNextPage && filteredPosts.length > 0 && (
-                                                <p className="text-muted-foreground text-sm">
-                                                    No more articles to load
-                                                </p>
-                                            )}
+                                    {/* Pagination - Only show when not searching and we have pagination info */}
+                                    {!searchQuery && pagination && totalPages > 1 && (
+                                        <div className="mt-16 flex justify-center">
+                                            <Pagination>
+                                                <PaginationContent className="flex items-center gap-2">
+                                                    <PaginationItem>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="default"
+                                                            onClick={() => {
+                                                                if (currentPage > 1) {
+                                                                    handlePageChange(currentPage - 1);
+                                                                }
+                                                            }}
+                                                            disabled={currentPage === 1}
+                                                            className="gap-2 px-4 py-2"
+                                                        >
+                                                            <ChevronLeft className="h-4 w-4" />
+                                                            <span>Previous</span>
+                                                        </Button>
+                                                    </PaginationItem>
+                                                    
+                                                    {/* Page Numbers */}
+                                                    {(() => {
+                                                        const pages: (number | 'ellipsis')[] = [];
+                                                        const showEllipsis = totalPages > 7;
+                                                        
+                                                        if (!showEllipsis) {
+                                                            // Show all pages if 7 or fewer
+                                                            for (let i = 1; i <= totalPages; i++) {
+                                                                pages.push(i);
+                                                            }
+                                                        } else {
+                                                            // Always show first page
+                                                            pages.push(1);
+                                                            
+                                                            if (currentPage <= 3) {
+                                                                // Show 1, 2, 3, 4, ..., last
+                                                                for (let i = 2; i <= 4; i++) {
+                                                                    pages.push(i);
+                                                                }
+                                                                pages.push('ellipsis');
+                                                                pages.push(totalPages);
+                                                            } else if (currentPage >= totalPages - 2) {
+                                                                // Show 1, ..., last-3, last-2, last-1, last
+                                                                pages.push('ellipsis');
+                                                                for (let i = totalPages - 3; i <= totalPages; i++) {
+                                                                    pages.push(i);
+                                                                }
+                                                            } else {
+                                                                // Show 1, ..., current-1, current, current+1, ..., last
+                                                                pages.push('ellipsis');
+                                                                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                                                                    pages.push(i);
+                                                                }
+                                                                pages.push('ellipsis');
+                                                                pages.push(totalPages);
+                                                            }
+                                                        }
+                                                        
+                                                        return pages.map((item, index) => {
+                                                            if (item === 'ellipsis') {
+                                                                return (
+                                                                    <PaginationItem key={`ellipsis-${index}`}>
+                                                                        <PaginationEllipsis />
+                                                                    </PaginationItem>
+                                                                );
+                                                            }
+                                                            return (
+                                                                <PaginationItem key={item}>
+                                                                    <Button
+                                                                        variant={currentPage === item ? "default" : "outline"}
+                                                                        size="icon"
+                                                                        onClick={() => handlePageChange(item)}
+                                                                        className={`h-10 w-10 ${
+                                                                            currentPage === item 
+                                                                                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                                                                : "hover:bg-muted"
+                                                                        }`}
+                                                                    >
+                                                                        {item}
+                                                                    </Button>
+                                                                </PaginationItem>
+                                                            );
+                                                        });
+                                                    })()}
+                                                    
+                                                    <PaginationItem>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="default"
+                                                            onClick={() => {
+                                                                if (currentPage < totalPages) {
+                                                                    handlePageChange(currentPage + 1);
+                                                                }
+                                                            }}
+                                                            disabled={currentPage === totalPages}
+                                                            className="gap-2 px-4 py-2"
+                                                        >
+                                                            <span>Next</span>
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        </Button>
+                                                    </PaginationItem>
+                                                </PaginationContent>
+                                            </Pagination>
                                         </div>
                                     )}
                                 </>
@@ -288,7 +373,6 @@ export default function BlogPage() {
                             )}
                         </div>
                     </section>
-                </>
             )}
 
             <Footer />
