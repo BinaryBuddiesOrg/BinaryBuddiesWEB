@@ -14,3 +14,4 @@ export default function WebDevelopmentLayout({
 }) {
     return children;
 }
+

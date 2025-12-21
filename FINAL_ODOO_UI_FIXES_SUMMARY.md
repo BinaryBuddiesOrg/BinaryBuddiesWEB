@@ -90,3 +90,4 @@ All fields are now visible and accessible in the Odoo UI:
 - ✅ Blog tags management interface available
 
 **Next Steps**: Restart Odoo to load the new blog tag model and views.
+

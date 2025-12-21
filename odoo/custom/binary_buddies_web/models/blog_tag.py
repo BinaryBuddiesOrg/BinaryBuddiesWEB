@@ -15,3 +15,4 @@ class BlogTag(models.Model):
     _sql_constraints = [
         ('name_unique', 'UNIQUE(name)', 'Tag name must be unique!')
     ]
+

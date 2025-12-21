@@ -77,3 +77,4 @@
 ## ✅ Status: ALL FIELDS NOW VISIBLE
 
 All SEO fields and tags are now visible and accessible in the Odoo UI!
+

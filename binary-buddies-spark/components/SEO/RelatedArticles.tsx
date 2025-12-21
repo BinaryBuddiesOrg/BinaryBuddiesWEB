@@ -21,3 +21,4 @@ export function RelatedArticles({ relatedPosts }: RelatedArticlesProps) {
         </section>
     );
 }
+

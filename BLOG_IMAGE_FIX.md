@@ -72,3 +72,4 @@ After restarting Odoo, check:
 ## ✅ Status: FIXED
 
 Images should now load correctly in the frontend after restarting Odoo!
+

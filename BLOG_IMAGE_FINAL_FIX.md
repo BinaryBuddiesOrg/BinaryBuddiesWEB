@@ -92,3 +92,4 @@ docker compose restart odoo
 **Frontend**: ✅ Ready (already handles images correctly)
 
 **Action Required**: Restart Odoo and upload images!
+

@@ -122,3 +122,4 @@ If you want to use Odoo-managed SEO in the future:
 - ✅ Odoo support is ready if you want it later
 
 **Answer: It's automatic, and Odoo support is available but optional.**
+

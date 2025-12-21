@@ -212,3 +212,4 @@ After all steps:
 4. **Test and verify**
 
 The code is correct - the issue is that Odoo needs to be restarted for the API changes to take effect!
+

@@ -147,3 +147,4 @@ All SEO implementation tasks from the plan have been successfully completed. The
 - ✅ Tags support for blog posts
 - ✅ All fields visible in Odoo UI
 - ✅ Blog tags management interface
+

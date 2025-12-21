@@ -45,3 +45,4 @@
 2. **API**: Include tags in API response
 3. **Frontend**: Display tags on blog pages
 4. **SEO**: Use tags in schema markup and keywords
+

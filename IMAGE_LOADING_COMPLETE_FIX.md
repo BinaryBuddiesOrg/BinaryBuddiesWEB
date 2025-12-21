@@ -187,3 +187,4 @@ After completing all steps:
 4. **Test and verify**
 
 The code is correct - you just need to restart Odoo and ensure images are uploaded!
+

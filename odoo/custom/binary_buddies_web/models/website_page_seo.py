@@ -96,3 +96,4 @@ class WebsitePageSEO(models.Model):
             })
         
         return result
+

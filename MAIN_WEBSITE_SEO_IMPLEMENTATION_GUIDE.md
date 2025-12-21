@@ -168,3 +168,4 @@ export async function generateMetadata(): Promise<Metadata> {
 - **Automatic**: ✅ Yes, hardcoded SEO works automatically
 - **Odoo Support**: ✅ Yes, system is ready but optional
 - **Recommendation**: Use hardcoded for now, add Odoo integration when you need to manage SEO from UI
+

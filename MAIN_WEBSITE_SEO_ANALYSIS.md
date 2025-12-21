@@ -78,3 +78,4 @@ Then:
 | **Centralized Management** | ❌ No | ✅ Yes |
 | **Consistent with Blog** | ❌ No | ✅ Yes |
 | **Automatic Fallback** | N/A | ✅ Yes (if not set in Odoo) |
+

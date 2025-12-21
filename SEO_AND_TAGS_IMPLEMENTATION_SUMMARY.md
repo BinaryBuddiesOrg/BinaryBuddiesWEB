@@ -132,3 +132,4 @@ tag_ids = fields.Many2many('bbweb.blog.tag', string='Tags')
 **Integration**: ✅ Tags integrated with SEO (keywords, schema)
 
 All requirements from the plan are now implemented!
+

@@ -114,3 +114,4 @@ If images still don't load:
 - ✅ Frontend: Image loading improved
 - ✅ API: Encoding fixed
 - ⚠️ **Action Required**: Restart Odoo + Upload images
+

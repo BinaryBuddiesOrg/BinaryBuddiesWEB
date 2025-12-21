@@ -215,3 +215,4 @@ After running the debug script:
 4. **Check conversion** - Verify `base64ToDataUrl()` is working
 
 The debug logs will tell us exactly where the issue is!
+
