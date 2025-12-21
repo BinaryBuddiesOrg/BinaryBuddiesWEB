@@ -106,8 +106,8 @@ class BinaryBuddiesWebAPI(http.Controller):
 
     # Blog Posts Endpoints
     @http.route('/api/bbweb/blogs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
-    def get_blogs(self, category=None, **kwargs):
-        """Get all active blog posts, optionally filtered by category"""
+    def get_blogs(self, category=None, page=1, limit=None, **kwargs):
+        """Get all active blog posts, optionally filtered by category, with pagination"""
         try:
             if request.httprequest.method == 'OPTIONS':
                 return self._json_response({})
@@ -121,20 +121,45 @@ class BinaryBuddiesWebAPI(http.Controller):
             }
             
             category_filter = category_map.get(category) if category else None
-            blogs = request.env['bbweb.blog.post'].sudo().get_api_data(category_filter=category_filter)
-            return self._json_response(blogs)
+            
+            # Parse pagination parameters
+            try:
+                page = int(page) if page else 1
+                limit = int(limit) if limit else None
+            except (ValueError, TypeError):
+                page = 1
+                limit = None
+            
+            result = request.env['bbweb.blog.post'].sudo().get_api_data(
+                category_filter=category_filter,
+                page=page,
+                limit=limit
+            )
+            return self._json_response(result)
         except Exception as e:
             return self._error_response(str(e), status=500)
 
     @http.route('/api/bbweb/blogs/featured', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
-    def get_featured_blogs(self, **kwargs):
-        """Get all featured blog posts"""
+    def get_featured_blogs(self, page=1, limit=None, **kwargs):
+        """Get all featured blog posts with pagination"""
         try:
             if request.httprequest.method == 'OPTIONS':
                 return self._json_response({})
             
-            blogs = request.env['bbweb.blog.post'].sudo().get_api_data(featured_only=True)
-            return self._json_response(blogs)
+            # Parse pagination parameters
+            try:
+                page = int(page) if page else 1
+                limit = int(limit) if limit else None
+            except (ValueError, TypeError):
+                page = 1
+                limit = None
+            
+            result = request.env['bbweb.blog.post'].sudo().get_api_data(
+                featured_only=True,
+                page=page,
+                limit=limit
+            )
+            return self._json_response(result)
         except Exception as e:
             return self._error_response(str(e), status=500)
 
@@ -159,10 +184,11 @@ class BinaryBuddiesWebAPI(http.Controller):
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
-            # Note: Odoo Binary fields already store data as base64 string
-            # We just need to decode bytes to string, NOT re-encode
-            image_data = blog.image.decode('utf-8') if blog.image else None
-            og_image_data = blog.og_image.decode('utf-8') if blog.og_image else image_data
+            # Generate image URLs instead of base64
+            has_image = bool(blog.image)
+            has_og_image = bool(blog.og_image)
+            image_url = blog._get_image_url(has_image, blog.id)
+            og_image_url = blog._get_og_image_url(has_og_image, has_image, blog.id)
             
             data = {
                 'id': str(blog.id),
@@ -177,13 +203,14 @@ class BinaryBuddiesWebAPI(http.Controller):
                 },
                 'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
                 'readTime': blog.read_time,
-                'image': image_data,
+                'image': image_url,  # URL instead of base64
                 'featured': blog.featured,
                 'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
-                'og_image': og_image_data,
+                'og_image': og_image_url,  # URL instead of base64
+                'view_count': blog.view_count,
             }
             return self._json_response(data)
         except Exception as e:
@@ -214,10 +241,11 @@ class BinaryBuddiesWebAPI(http.Controller):
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
-            # Note: Odoo Binary fields already store data as base64 string
-            # We just need to decode bytes to string, NOT re-encode
-            image_data = blog.image.decode('utf-8') if blog.image else None
-            og_image_data = blog.og_image.decode('utf-8') if blog.og_image else image_data
+            # Generate image URLs instead of base64
+            has_image = bool(blog.image)
+            has_og_image = bool(blog.og_image)
+            image_url = blog._get_image_url(has_image, blog.id)
+            og_image_url = blog._get_og_image_url(has_og_image, has_image, blog.id)
             
             data = {
                 'id': str(blog.id),
@@ -232,15 +260,174 @@ class BinaryBuddiesWebAPI(http.Controller):
                 },
                 'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
                 'readTime': blog.read_time,
-                'image': image_data,
+                'image': image_url,  # URL instead of base64
                 'featured': blog.featured,
                 'tags': [t.name for t in blog.tag_ids],
                 'seo_title': blog.seo_title or blog.title,
                 'seo_description': blog.seo_description or blog.excerpt,
                 'seo_keywords': blog.seo_keywords or '',
-                'og_image': og_image_data,
+                'og_image': og_image_url,  # URL instead of base64
+                'view_count': blog.view_count,
             }
             return self._json_response(data)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+    
+    @http.route('/api/bbweb/blogs/<int:blog_id>/image', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_image(self, blog_id, **kwargs):
+        """Serve blog preview image"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return request.make_response(
+                    b'',
+                    headers=[
+                        ('Access-Control-Allow-Origin', '*'),
+                        ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                        ('Access-Control-Allow-Headers', 'Content-Type'),
+                    ]
+                )
+            
+            blog = request.env['bbweb.blog.post'].sudo().browse(blog_id)
+            if not blog.exists() or not blog.image:
+                return self._error_response('Image not found', status=404)
+            
+            # Get image data - Odoo binary fields are stored as base64 strings
+            import base64
+            image_data = blog.image
+            if not image_data:
+                return self._error_response('Image not found', status=404)
+            
+            # Decode base64 to get actual binary data
+            # Odoo stores binary fields as base64-encoded strings
+            if isinstance(image_data, str):
+                try:
+                    image_data = base64.b64decode(image_data)
+                except Exception as e:
+                    return self._error_response(f'Failed to decode image: {str(e)}', status=500)
+            elif isinstance(image_data, bytes):
+                # If it's already bytes, check if it's base64-encoded text
+                try:
+                    # Try to decode as base64 if it looks like base64
+                    decoded = base64.b64decode(image_data)
+                    image_data = decoded
+                except:
+                    # If decoding fails, assume it's already binary
+                    pass
+            
+            # Detect image type from binary data
+            content_type = 'image/jpeg'  # Default
+            
+            # Check image signature to determine type
+            if len(image_data) > 0:
+                if image_data.startswith(b'\x89PNG\r\n\x1a\n'):
+                    content_type = 'image/png'
+                elif image_data.startswith(b'GIF87a') or image_data.startswith(b'GIF89a'):
+                    content_type = 'image/gif'
+                elif len(image_data) > 12 and image_data.startswith(b'RIFF') and b'WEBP' in image_data[:12]:
+                    content_type = 'image/webp'
+                elif image_data.startswith(b'\xff\xd8\xff'):
+                    content_type = 'image/jpeg'
+            
+            # Return image with proper headers
+            return request.make_response(
+                image_data,
+                headers=[
+                    ('Content-Type', content_type),
+                    ('Cache-Control', 'public, max-age=31536000'),  # Cache for 1 year
+                    ('Access-Control-Allow-Origin', '*'),
+                    ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                    ('Access-Control-Allow-Headers', 'Content-Type'),
+                ]
+            )
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return self._error_response(str(e), status=500)
+    
+    @http.route('/api/bbweb/blogs/<int:blog_id>/og-image', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_og_image(self, blog_id, **kwargs):
+        """Serve blog OG image"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return request.make_response(
+                    b'',
+                    headers=[
+                        ('Access-Control-Allow-Origin', '*'),
+                        ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                        ('Access-Control-Allow-Headers', 'Content-Type'),
+                    ]
+                )
+            
+            blog = request.env['bbweb.blog.post'].sudo().browse(blog_id)
+            if not blog.exists():
+                return self._error_response('Blog post not found', status=404)
+            
+            # Use OG image if available, otherwise fallback to preview image
+            import base64
+            image_data = blog.og_image if blog.og_image else blog.image
+            if not image_data:
+                return self._error_response('Image not found', status=404)
+            
+            # Decode base64 to get actual binary data
+            # Odoo stores binary fields as base64-encoded strings
+            if isinstance(image_data, str):
+                try:
+                    image_data = base64.b64decode(image_data)
+                except Exception as e:
+                    return self._error_response(f'Failed to decode image: {str(e)}', status=500)
+            elif isinstance(image_data, bytes):
+                # If it's already bytes, check if it's base64-encoded text
+                try:
+                    # Try to decode as base64 if it looks like base64
+                    decoded = base64.b64decode(image_data)
+                    image_data = decoded
+                except:
+                    # If decoding fails, assume it's already binary
+                    pass
+            
+            # Detect image type from binary data
+            content_type = 'image/jpeg'  # Default
+            
+            # Check image signature to determine type
+            if len(image_data) > 0:
+                if image_data.startswith(b'\x89PNG\r\n\x1a\n'):
+                    content_type = 'image/png'
+                elif image_data.startswith(b'GIF87a') or image_data.startswith(b'GIF89a'):
+                    content_type = 'image/gif'
+                elif len(image_data) > 12 and image_data.startswith(b'RIFF') and b'WEBP' in image_data[:12]:
+                    content_type = 'image/webp'
+                elif image_data.startswith(b'\xff\xd8\xff'):
+                    content_type = 'image/jpeg'
+            
+            # Return image with proper headers
+            return request.make_response(
+                image_data,
+                headers=[
+                    ('Content-Type', content_type),
+                    ('Cache-Control', 'public, max-age=31536000'),  # Cache for 1 year
+                    ('Access-Control-Allow-Origin', '*'),
+                    ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                    ('Access-Control-Allow-Headers', 'Content-Type'),
+                ]
+            )
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return self._error_response(str(e), status=500)
+    
+    @http.route('/api/bbweb/blogs/<int:blog_id>/view', type='http', auth='public', methods=['POST', 'OPTIONS'], csrf=False, cors='*')
+    def increment_blog_view(self, blog_id, **kwargs):
+        """Increment view count for a blog post"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            blog = request.env['bbweb.blog.post'].sudo().browse(blog_id)
+            if not blog.exists() or not blog.active:
+                return self._error_response('Blog post not found', status=404)
+            
+            blog.increment_view_count()
+            return self._json_response({'status': 'success', 'view_count': blog.view_count})
         except Exception as e:
             return self._error_response(str(e), status=500)
 

@@ -44,13 +44,25 @@ export interface ApiBlogPost {
     };
     date: string;
     readTime: string;
-    image: string | null; // base64 encoded
+    image: string | null; // URL to image (not base64)
     featured: boolean;
     tags?: string[]; // Blog post tags
     seo_title?: string;
     seo_description?: string;
     seo_keywords?: string;
-    og_image?: string | null; // base64 encoded
+    og_image?: string | null; // URL to image (not base64)
+    view_count?: number; // Number of views
+}
+
+// Pagination response structure
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number | null;
+        has_more: boolean;
+    };
 }
 
 // Careers

@@ -181,9 +181,21 @@ export async function fetchTeamMember(id: number): Promise<ApiTeamMember> {
 export interface FetchBlogsOptions {
     category?: string;
     featured?: boolean;
+    page?: number;
+    limit?: number;
 }
 
-export async function fetchBlogs(options?: FetchBlogsOptions & { skipError?: boolean }): Promise<ApiBlogPost[]> {
+export interface PaginatedBlogResponse {
+    data: ApiBlogPost[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number | null;
+        has_more: boolean;
+    };
+}
+
+export async function fetchBlogs(options?: FetchBlogsOptions & { skipError?: boolean }): Promise<ApiBlogPost[] | PaginatedBlogResponse> {
     let url: string = API_ENDPOINTS.blogs;
 
     // Use featured endpoint if requested
@@ -191,52 +203,69 @@ export async function fetchBlogs(options?: FetchBlogsOptions & { skipError?: boo
         url = API_ENDPOINTS.blogsFeatured;
     }
 
-    // Add category filter if provided
+    // Build query parameters
+    const params: Record<string, string> = {};
     if (options?.category && !options?.featured) {
-        url = buildUrl(url, { category: options.category });
+        params.category = options.category;
+    }
+    if (options?.page) {
+        params.page = options.page.toString();
+    }
+    if (options?.limit) {
+        params.limit = options.limit.toString();
     }
 
-    const data = await fetchApi<ApiBlogPost[]>(url, { skipError: options?.skipError });
+    if (Object.keys(params).length > 0) {
+        url = buildUrl(url, params);
+    }
 
-    // Transform base64 images to data URLs
-    return data.map(post => {
-        const convertedImage = base64ToDataUrl(post.image);
-        
-        // Debug logging (only in development)
-        if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-            if (post.image && !convertedImage) {
-                console.warn(`[fetchBlogs] Failed to convert image for post "${post.title}":`, {
-                    originalLength: post.image?.length,
-                    originalPreview: post.image?.substring(0, 50),
-                });
-            }
-        }
-        
-        return {
-            ...post,
-            image: convertedImage,
-        };
-    });
+    const data = await fetchApi<PaginatedBlogResponse | ApiBlogPost[]>(url, { skipError: options?.skipError });
+
+    // Check if response is paginated (has pagination property) or legacy format (array)
+    if (Array.isArray(data)) {
+        // Legacy format - return as is (images are already URLs from backend)
+        return data;
+    } else {
+        // Paginated format - images are already URLs from backend
+        return data;
+    }
 }
 
 export async function fetchBlog(id: number): Promise<ApiBlogPost> {
     const data = await fetchApi<ApiBlogPost>(API_ENDPOINTS.blog(id));
 
-    return {
-        ...data,
-        image: base64ToDataUrl(data.image),
-        og_image: data.og_image ? base64ToDataUrl(data.og_image) : null,
-    };
+    // Images are now URLs from backend, not base64
+    return data;
 }
 
 export async function fetchBlogBySlug(slug: string): Promise<ApiBlogPost> {
     const data = await fetchApi<ApiBlogPost>(API_ENDPOINTS.blogBySlug(slug));
 
-    return {
-        ...data,
-        image: base64ToDataUrl(data.image),
-        og_image: data.og_image ? base64ToDataUrl(data.og_image) : null,
-    };
+    // Images are now URLs from backend, not base64
+    return data;
+}
+
+export async function incrementBlogView(blogId: number): Promise<{ status: string; view_count: number }> {
+    const url = `${API_ENDPOINTS.blog(blogId)}/view`;
+    const isClient = typeof window !== 'undefined';
+    const absoluteUrl = isClient ? url : ensureAbsoluteUrl(url);
+    
+    const response = await fetch(absoluteUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new ApiRequestError(
+            `Failed to increment view count: ${response.statusText}`,
+            response.status,
+            response.statusText
+        );
+    }
+
+    return response.json();
 }
 
 // ============================================================================

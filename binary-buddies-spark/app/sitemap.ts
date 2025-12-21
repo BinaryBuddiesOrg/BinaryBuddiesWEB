@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { fetchBlogs } from '@/services/api';
+import type { ApiBlogPost } from '@/types/api';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://binarybuddies.in';
 
@@ -92,8 +93,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     let blogPages: MetadataRoute.Sitemap = [];
     
     try {
-        const blogs = await fetchBlogs({ skipError: true });
-        if (blogs && blogs.length > 0) {
+        const blogsResult = await fetchBlogs({ skipError: true });
+        // Handle both array and paginated response formats
+        let blogs: ApiBlogPost[] = [];
+        if (Array.isArray(blogsResult)) {
+            blogs = blogsResult;
+        } else if (blogsResult && blogsResult.data) {
+            blogs = blogsResult.data;
+        }
+        
+        if (blogs.length > 0) {
             blogPages = blogs.map((blog) => ({
                 url: `${baseUrl}/blog/${blog.slug}`,
                 lastModified: new Date(blog.date),

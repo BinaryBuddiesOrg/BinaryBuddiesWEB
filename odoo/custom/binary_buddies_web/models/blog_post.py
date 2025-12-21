@@ -86,9 +86,16 @@ class BlogPost(models.Model):
     featured = fields.Boolean(string='Featured Post', default=False)
     active = fields.Boolean(string='Active', default=True)
     
+    # View count for analytics
+    view_count = fields.Integer(string='View Count', default=0, help='Number of times this blog post has been viewed')
+    
     _sql_constraints = [
         ('slug_unique', 'UNIQUE(slug)', 'The slug must be unique!'),
     ]
+    
+    def increment_view_count(self):
+        """Increment the view count for this blog post"""
+        self.write({'view_count': self.view_count + 1})
     
     def _slugify(self, text):
         """
@@ -162,6 +169,7 @@ class BlogPost(models.Model):
         
         return super(BlogPost, self).write(vals)
     
+    @api.model
     def _get_base_url(self):
         """Get the base URL for the Odoo instance"""
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
@@ -197,9 +205,36 @@ class BlogPost(models.Model):
         
         return processed_content
     
+    def _get_image_url(self, has_image, image_id):
+        """Generate URL for serving image via API - use relative URL for Next.js proxy"""
+        # Check if image exists (binary field can be False, empty bytes, or None)
+        if not has_image:
+            return None
+        # Use relative URL so it goes through Next.js rewrite proxy
+        return f"/api/bbweb/blogs/{image_id}/image"
+    
+    def _get_og_image_url(self, has_og_image, has_image, image_id):
+        """Generate URL for serving OG image via API - use relative URL for Next.js proxy"""
+        if has_og_image:
+            return f"/api/bbweb/blogs/{image_id}/og-image"
+        elif has_image:
+            return f"/api/bbweb/blogs/{image_id}/image"
+        return None
+    
     @api.model
-    def get_api_data(self, category_filter=None, featured_only=False):
-        """Return data formatted for API consumption"""
+    def get_api_data(self, category_filter=None, featured_only=False, page=1, limit=None):
+        """
+        Return data formatted for API consumption with pagination support
+        
+        Args:
+            category_filter: Filter by category
+            featured_only: Only return featured posts
+            page: Page number (1-indexed)
+            limit: Number of items per page (None = all)
+        
+        Returns:
+            dict with 'data' (list of posts) and 'pagination' (dict with total, page, limit, has_more)
+        """
         domain = [('active', '=', True)]
         
         if category_filter:
@@ -208,8 +243,18 @@ class BlogPost(models.Model):
         if featured_only:
             domain.append(('featured', '=', True))
         
-        posts = self.search(domain, order='publish_date desc, id desc')
+        # Get total count for pagination
+        total_count = self.search_count(domain)
+        
+        # Calculate offset
+        if limit:
+            offset = (page - 1) * limit
+            posts = self.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
+        else:
+            posts = self.search(domain, order='publish_date desc, id desc')
+        
         result = []
+        base_url = self._get_base_url()
         
         # Category mapping for API
         category_map = {
@@ -223,10 +268,12 @@ class BlogPost(models.Model):
             # Process content to fix relative URLs
             processed_content = post._process_html_content(post.content)
             
-            # Note: Odoo Binary fields already store data as base64 string
-            # We just need to decode bytes to string, NOT re-encode
-            image_data = post.image.decode('utf-8') if post.image else None
-            og_image_data = post.og_image.decode('utf-8') if post.og_image else image_data
+            # Generate image URLs instead of base64
+            # Check if images exist (binary fields can be False, empty, or None)
+            has_image = bool(post.image)
+            has_og_image = bool(post.og_image)
+            image_url = post._get_image_url(has_image, post.id)
+            og_image_url = post._get_og_image_url(has_og_image, has_image, post.id)
             
             result.append({
                 'id': str(post.id),
@@ -241,14 +288,26 @@ class BlogPost(models.Model):
                 },
                 'date': post.publish_date.strftime('%Y-%m-%d') if post.publish_date else '',
                 'readTime': post.read_time,
-                'image': image_data,
+                'image': image_url,  # URL instead of base64
                 'featured': post.featured,
                 'tags': [t.name for t in post.tag_ids],
                 'seo_title': post.seo_title or post.title,
                 'seo_description': post.seo_description or post.excerpt,
                 'seo_keywords': post.seo_keywords or '',
-                'og_image': og_image_data,
+                'og_image': og_image_url,  # URL instead of base64
+                'view_count': post.view_count,
             })
         
-        return result
+        # Build pagination info
+        pagination = {
+            'total': total_count,
+            'page': page,
+            'limit': limit or total_count,
+            'has_more': limit and (offset + len(posts) < total_count) if limit else False,
+        }
+        
+        return {
+            'data': result,
+            'pagination': pagination,
+        }
 

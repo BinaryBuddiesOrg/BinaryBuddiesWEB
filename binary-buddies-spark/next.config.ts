@@ -17,8 +17,18 @@ const nextConfig: NextConfig = {
                 protocol: 'https',
                 hostname: '**',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '8069',
+            },
+            {
+                protocol: 'http',
+                hostname: '127.0.0.1',
+                port: '8069',
+            },
         ],
-        // Allow data URLs for base64 images from API
+        // Allow data URLs for base64 images from API (legacy support)
         dangerouslyAllowSVG: true,
         formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],

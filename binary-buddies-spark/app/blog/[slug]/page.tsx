@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { BlogShareButton } from "@/components/BlogShareButton";
 import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
 import { RelatedArticles } from "@/components/SEO/RelatedArticles";
 import { Breadcrumbs } from "@/components/SEO/Breadcrumbs";
+import { BlogViewTracker } from "@/components/BlogViewTracker";
+import { BlogImage } from "@/components/BlogImage";
 import { fetchBlogBySlug, fetchBlogs, fetchBlog, ApiRequestError } from "@/services/api";
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@/lib/schema";
 import type { ApiBlogPost } from "@/types/api";
@@ -21,10 +23,20 @@ export const revalidate = 3600; // Revalidate every hour (ISR)
 export async function generateStaticParams() {
     try {
         const featuredPosts = await fetchBlogs({ featured: true, skipError: true });
-        if (!featuredPosts || featuredPosts.length === 0) {
+        if (!featuredPosts) {
             return [];
         }
-        return featuredPosts.slice(0, 10).map((post) => ({
+        
+        // Handle both array and paginated response formats
+        const posts = Array.isArray(featuredPosts) 
+            ? featuredPosts 
+            : featuredPosts.data || [];
+        
+        if (posts.length === 0) {
+            return [];
+        }
+        
+        return posts.slice(0, 10).map((post) => ({
             slug: post.slug,
         }));
     } catch (error) {
@@ -160,7 +172,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         if (post) {
             try {
                 const allPosts = await fetchBlogs({ category: post.category, skipError: true });
-                relatedPosts = allPosts
+                
+                // Handle both array and paginated response formats
+                const posts = Array.isArray(allPosts) 
+                    ? allPosts 
+                    : allPosts.data || [];
+                
+                relatedPosts = posts
                     .filter(p => p.id !== post!.id && p.slug !== post!.slug)
                     .slice(0, 3);
             } catch (error) {
@@ -195,6 +213,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     };
 
     const currentUrl = `${SITE_URL}/blog/${post.slug}`;
+    const previewImage = post.image;
 
     const blogSchema = generateBlogPostingSchema(post);
     const breadcrumbSchema = generateBreadcrumbSchema([
@@ -207,6 +226,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="relative min-h-screen bg-background">
             <SchemaMarkup schema={blogSchema} />
             <SchemaMarkup schema={breadcrumbSchema} />
+            <BlogViewTracker blogId={parseInt(post.id)} />
             {/* Header Section - Clean and Professional */}
             <section className="relative pt-28 pb-12 border-b border-border/50">
                 <div className="container mx-auto px-4">
@@ -228,6 +248,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             Back to Blog
                         </Link>
 
+                        {/* Preview Image - Only show if image exists */}
+            {previewImage && (
+                <div className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden bg-muted/10">
+                    <BlogImage
+                        src={previewImage}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        priority={true}
+                    />
+                </div>
+            )}
+
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-3 mb-6">
                             <span className={`px-3 py-1 text-sm font-medium rounded-md ${categoryColors[post.category] || "bg-primary text-primary-foreground"}`}>
@@ -241,6 +273,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                 <Clock className="w-4 h-4" />
                                 {post.readTime}
                             </span>
+                            {post.view_count !== undefined && (
+                                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                    <Eye className="w-4 h-4" />
+                                    {post.view_count} {post.view_count === 1 ? 'view' : 'views'}
+                                </span>
+                            )}
                         </div>
 
                         {/* Tags */}

@@ -7,10 +7,13 @@ export default async function NotFound() {
     // Fetch featured blog posts for suggestions
     let featuredPosts: Awaited<ReturnType<typeof fetchBlogs>> = [];
     try {
-        featuredPosts = await fetchBlogs({ featured: true, skipError: true });
+        const result = await fetchBlogs({ featured: true, skipError: true });
+        // Handle both array and paginated response formats
+        featuredPosts = Array.isArray(result) ? result : (result.data || []);
     } catch (error) {
         console.error('Error fetching featured posts:', error);
         // Continue with empty array - page will still work
+        featuredPosts = [];
     }
 
     const helpfulLinks = [

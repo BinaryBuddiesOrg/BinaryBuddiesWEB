@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, Loader2, AlertCircle } from "lucide-react";
 import { BlogCard } from "@/components/BlogCard";
@@ -8,23 +8,76 @@ import { Footer } from "@/components/Footer";
 import { categories } from "@/data/blogData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useBlogs, useFeaturedBlogs } from "@/hooks/useBlogs";
+import { useInfiniteBlogs, useFeaturedBlogs } from "@/hooks/useBlogs";
+import type { ApiBlogPost } from "@/types/api";
+import type { PaginatedBlogResponse } from "@/services/api";
 
 export default function BlogPage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
+    const loadMoreRef = useRef<HTMLDivElement>(null);
 
-    // Fetch blogs based on selected category
+    // Fetch blogs with infinite scroll
     const categoryFilter = selectedCategory !== "All" ? selectedCategory : undefined;
-    const { data: allPosts, isLoading, error } = useBlogs({ category: categoryFilter });
-    const { data: featuredPosts } = useFeaturedBlogs();
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        error,
+    } = useInfiniteBlogs({
+        category: categoryFilter,
+        limit: 12, // Load 12 blogs per page
+    });
+
+    const { data: featuredPostsData } = useFeaturedBlogs();
+    
+    // Extract featured posts (handle both array and paginated response)
+    const featuredPosts = useMemo(() => {
+        if (!featuredPostsData) return [];
+        if (Array.isArray(featuredPostsData)) return featuredPostsData;
+        return featuredPostsData.data || [];
+    }, [featuredPostsData]);
+
+    // Flatten all pages of blog posts
+    const allPosts = useMemo(() => {
+        if (!infiniteData?.pages) return [];
+        return (infiniteData.pages as PaginatedBlogResponse[]).flatMap((page) => page.data);
+    }, [infiniteData]);
 
     // Client-side search filtering
-    const filteredPosts = allPosts?.filter((post) => {
-        const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesSearch;
-    }) || [];
+    const filteredPosts = useMemo(() => {
+        if (!searchQuery.trim()) return allPosts;
+        return allPosts.filter((post) => {
+            const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesSearch;
+        });
+    }, [allPosts, searchQuery]);
+
+    // Intersection Observer for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !searchQuery) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        const currentRef = loadMoreRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
+
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage, searchQuery]);
 
     return (
         <div className="relative">
@@ -195,16 +248,37 @@ export default function BlogPage() {
                                 className="text-center mb-8"
                             >
                                 <p className="text-muted-foreground">
-                                    {filteredPosts.length} {filteredPosts.length === 1 ? "article" : "articles"} found
+                                    {searchQuery 
+                                        ? `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"} found`
+                                        : infiniteData?.pages && (infiniteData.pages as PaginatedBlogResponse[])[0]?.pagination?.total 
+                                            ? `${(infiniteData.pages as PaginatedBlogResponse[])[0].pagination.total} total ${(infiniteData.pages as PaginatedBlogResponse[])[0].pagination.total === 1 ? "article" : "articles"}`
+                                            : `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"}`
+                                    }
                                 </p>
                             </motion.div>
 
                             {filteredPosts.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {filteredPosts.map((post, index) => (
-                                        <BlogCard key={post.id} post={post} index={index} />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                        {filteredPosts.map((post, index) => (
+                                            <BlogCard key={post.id} post={post} index={index} />
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Infinite scroll trigger - only show when not searching */}
+                                    {!searchQuery && (
+                                        <div ref={loadMoreRef} className="mt-12 flex justify-center">
+                                            {isFetchingNextPage && (
+                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                            )}
+                                            {!hasNextPage && filteredPosts.length > 0 && (
+                                                <p className="text-muted-foreground text-sm">
+                                                    No more articles to load
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className="text-center py-16">
                                     <p className="text-muted-foreground text-lg">
