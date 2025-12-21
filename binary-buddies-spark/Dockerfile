@@ -1,5 +1,5 @@
 # Multi-stage build for optimized Next.js production image
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -7,10 +7,11 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json ./
+COPY package-lock.json* ./
 
 # Install dependencies
-RUN npm ci --silent
+RUN npm ci || (npm install && npm cache clean --force)
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -35,6 +36,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
