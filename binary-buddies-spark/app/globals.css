@@ -298,3 +298,105 @@ All colors MUST be HSL.
         @apply text-lg;
     }
 }
+
+/* Adsterra Ad Styles */
+.adsterra-ad-container {
+    width: 100% !important;
+    max-width: 728px !important;
+    margin: 20px auto !important;
+    min-height: 90px !important;
+}
+
+.adsterra-ad-iframe {
+    width: 100% !important;
+    max-width: 728px !important;
+    min-height: 90px !important;
+    border: none !important;
+    display: block !important;
+    margin: 20px auto !important;
+    background: transparent !important;
+}
+
+.adsterra-ad-placeholder {
+    width: 100% !important;
+    max-width: 728px !important;
+    min-height: 90px !important;
+    margin: 20px auto !important;
+}
+
+@media (max-width: 768px) {
+    .adsterra-ad-container,
+    .adsterra-ad-iframe,
+    .adsterra-ad-placeholder {
+        max-width: 100% !important;
+    }
+}
+
+/* Smart Link Button Styles */
+.smart-link-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.smart-link-button:hover {
+    background: hsl(var(--primary-glow));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.smart-link-button-secondary {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+}
+
+.smart-link-button-outline {
+    background: transparent;
+    border: 2px solid hsl(var(--primary));
+    color: hsl(var(--primary));
+}
+
+.smart-link-button-outline:hover {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+/* Adsterra Ad Container Styles */
+.adsterra-ad-container {
+    width: 100% !important;
+    max-width: 728px !important;
+    margin: 20px auto !important;
+    text-align: center !important;
+    min-height: 90px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.adsterra-ad-iframe {
+    width: 100% !important;
+    max-width: 728px !important;
+    min-height: 90px !important;
+    border: none !important;
+    display: block !important;
+    margin: 20px auto !important;
+    background: transparent !important;
+}
+
+/* Responsive ad container */
+@media (max-width: 768px) {
+    .adsterra-ad-container {
+        max-width: 100% !important;
+    }
+    
+    .adsterra-ad-iframe {
+        max-width: 100% !important;
+    }
+}

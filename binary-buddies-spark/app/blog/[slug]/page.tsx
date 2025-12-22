@@ -9,6 +9,7 @@ import { RelatedArticles } from "@/components/SEO/RelatedArticles";
 import { Breadcrumbs } from "@/components/SEO/Breadcrumbs";
 import { BlogViewTracker } from "@/components/BlogViewTracker";
 import { BlogImage } from "@/components/BlogImage";
+import { BlogContentWithScripts } from "@/components/BlogContentWithScripts";
 import { fetchBlogBySlug, fetchBlogs, fetchBlog, ApiRequestError } from "@/services/api";
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@/lib/schema";
 import type { ApiBlogPost } from "@/types/api";
@@ -326,10 +327,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         )}
 
                         {/* Main Content */}
-                        <div
-                            className="blog-prose"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
+                        <BlogContentWithScripts content={post.content} />
 
                         {/* Share Section */}
                         <div className="mt-12 pt-8 border-t border-border flex flex-wrap justify-between items-center gap-4">

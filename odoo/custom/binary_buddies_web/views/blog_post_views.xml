@@ -69,11 +69,42 @@
                             </div>
                         </page>
                         <page string="HTML Source (Advanced)" name="content_source">
-                            <group>
-                                <field name="content" widget="ace" options="{'mode': 'html'}"  nolabel="1"/>
+                            <style>
+                                .html_editor_wrapper {
+                                    width: 100% !important;
+                                }
+                                .html_editor_wrapper .ace_editor {
+                                    width: 100% !important;
+                                    min-height: 500px !important;
+                                    font-size: 14px !important;
+                                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace !important;
+                                }
+                                .html_editor_wrapper .ace_scroller {
+                                    overflow-x: hidden !important;
+                                }
+                                .html_editor_wrapper .ace_content {
+                                    white-space: pre-wrap !important;
+                                    word-wrap: break-word !important;
+                                }
+                                .html_editor_wrapper .ace_scrollbar-h {
+                                    display: none !important;
+                                }
+                            </style>
+                            <group class="html_editor_wrapper">
+                                <field name="content" widget="ace" options="{'mode': 'html', 'wrap': true, 'useWrapMode': true, 'fontSize': 14, 'theme': 'chrome'}" nolabel="1"/>
                             </group>
                             <div class="alert alert-info mt-2" role="alert">
-                                <strong>HTML Code Editor:</strong> Paste iframe codes and custom HTML here. Changes sync with the Visual Editor tab.
+                                <strong>📝 HTML Code Editor:</strong> Paste iframe codes and custom HTML here. Changes sync with the Visual Editor tab.<br/>
+                                <strong>💡 How to Paste Adsterra Ad Code:</strong><br/>
+                                1. Copy your Adsterra ad code from the Adsterra dashboard (e.g., Banner ad code or Smart Link URL)<br/>
+                                2. Click in the editor above to place your cursor<br/>
+                                3. Paste your code (Ctrl+V or Cmd+V)<br/>
+                                4. The code will wrap automatically to fit the editor width<br/>
+                                5. Click "Save" button to save your changes<br/>
+                                <strong>✅ Example Adsterra Banner Code:</strong><br/>
+                                <code>&lt;script type="text/javascript"&gt;atOptions = {'key': 'YOUR_ID', 'format': 'iframe', 'height': 90, 'width': 728};&lt;/script&gt;<br/>&lt;script src="//www.highperformanceformat.com/YOUR_ID/invoke.js"&gt;&lt;/script&gt;</code><br/>
+                                <strong>✅ Example Smart Link:</strong><br/>
+                                <code>&lt;a href="https://www.effectivegatecpm.com/YOUR_ID?key=YOUR_KEY" target="_blank"&gt;Click here&lt;/a&gt;</code>
                             </div>
                         </page>
                         <page string="SEO Settings" name="seo">
