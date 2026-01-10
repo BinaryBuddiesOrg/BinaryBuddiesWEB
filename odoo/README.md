@@ -362,6 +362,89 @@ https://d28amk8ucon4hu.cloudfront.net/image_1024-783-0.png
 
 ---
 
+## Migrating Old Attachments to S3
+
+When you first set up S3 storage, **existing files remain in their original location** (local filestore or database). Only **new uploads** go to S3 automatically.
+
+### Understanding Storage Locations
+
+| Storage Type | Path Format | Description |
+|--------------|-------------|-------------|
+| **S3** | `s3_attachments_manual://filename.png` | New files after S3 setup |
+| **Local Filestore** | `d9/d919b0af...` (hex path) | Old files in Docker volume |
+| **Database** | Empty `store_fname` | Small files < 50KB |
+
+### Check Current Storage Status
+
+```bash
+# See where files are stored
+docker exec bbweb-postgres-odoo psql -U odoo -d bbweb_odoo -c "
+SELECT 
+    CASE 
+        WHEN fs_storage_id IS NOT NULL THEN 'S3'
+        WHEN store_fname IS NOT NULL AND store_fname != '' THEN 'Local Filestore'
+        ELSE 'Database'
+    END as storage,
+    COUNT(*) as count,
+    pg_size_pretty(SUM(file_size)) as total_size
+FROM ir_attachment 
+WHERE file_size > 0
+GROUP BY 1
+ORDER BY 2 DESC;"
+```
+
+### Migration Command
+
+To migrate ALL existing attachments from local filestore to S3:
+
+#### Step 1: Open Odoo Shell
+```bash
+docker exec -it bbweb-odoo odoo shell -c /etc/odoo/odoo.conf -d bbweb_odoo
+```
+
+#### Step 2: Run Migration
+```python
+# This will move all attachments to the default storage (S3)
+env['ir.attachment'].force_storage()
+
+# Commit the changes
+env.cr.commit()
+
+# Exit shell
+exit()
+```
+
+#### Step 3: Verify Migration
+```bash
+# Check S3 bucket for new files
+docker exec bbweb-odoo python3 -c "
+import boto3
+s3 = boto3.client('s3', region_name='ap-south-1')
+response = s3.list_objects_v2(Bucket='binarybuddies-attachments')
+print(f'Total files in S3: {response.get(\"KeyCount\", 0)}')"
+```
+
+### What Happens During Migration
+
+1. **Files > 50KB** (images, documents) → Copied to S3 bucket
+2. **Files < 50KB** (small images) → Kept in database (faster access)
+3. **JS/CSS files** → Kept in database (per configuration)
+4. **Database updated** → `fs_storage_id` and `store_fname` fields updated
+5. **Old files** → Remain in local filestore (can be cleaned later)
+
+### Important Notes
+
+> ⚠️ **Before Migration:**
+> - Backup your database: `docker exec bbweb-postgres-odoo pg_dump -U odoo bbweb_odoo > backup.sql`
+> - Ensure S3 connection is working (Test Connection in Odoo UI)
+> - Migration may take time for large databases
+
+> ⚠️ **After Migration:**
+> - Old files in `/var/lib/odoo/filestore/` can be deleted after verification
+> - CloudFront will serve the migrated files automatically
+
+---
+
 ## Current Production Values
 
 | Setting | Value |
