@@ -575,3 +575,246 @@ class BinaryBuddiesWebAPI(http.Controller):
             return self._json_response(data)
         except Exception as e:
             return self._error_response(str(e), status=500)
+
+    # Blog Creation Endpoint
+    @http.route('/api/bbweb/blogs/create', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def create_blog(self, **kwargs):
+        """
+        Create a new blog post with dual authentication support.
+        
+        Authentication methods:
+        1. Session-based (Frontend users): Pass 'google_id' in params
+        2. API Key (Backend programs): Send 'X-API-Key' header
+        
+        Images are automatically stored in S3 (all sizes).
+        Only JS/CSS files remain in database for performance.
+        """
+        import base64
+        import logging
+        _logger = logging.getLogger(__name__)
+        
+        try:
+            # ============================================================
+            # AUTHENTICATION
+            # ============================================================
+            google_id = kwargs.get('google_id')
+            api_key = request.httprequest.headers.get('X-API-Key')
+            
+            authenticated_as = None
+            author_user = None
+            
+            # Session-based authentication (website users)
+            if google_id:
+                user = request.env['bbweb.website.user'].sudo().search([
+                    ('google_id', '=', google_id),
+                    ('active', '=', True),
+                    ('is_banned', '=', False)
+                ], limit=1)
+                
+                if not user:
+                    return {
+                        'status': 'error',
+                        'message': 'User not found or banned. Please contact administrator.'
+                    }
+                
+                if not user.can_author_blogs:
+                    return {
+                        'status': 'error',
+                        'message': 'Permission denied. You do not have permission to create blog posts. Please contact administrator to grant "Can Author Blogs" permission.'
+                    }
+                
+                authenticated_as = 'session'
+                author_user = user
+                _logger.info(f"Blog creation authenticated via session for user: {user.email}")
+                
+            # API Key authentication (backend programs)
+            elif api_key:
+                expected_key = request.env['ir.config_parameter'].sudo().get_param('bbweb.blog_api_key')
+                
+                if not expected_key:
+                    return {
+                        'status': 'error',
+                        'message': 'API key authentication not configured. Please contact administrator.'
+                    }
+                
+                if api_key != expected_key:
+                    _logger.warning(f"Invalid API key attempt from IP: {request.httprequest.remote_addr}")
+                    return {
+                        'status': 'error',
+                        'message': 'Invalid API key. Access denied.'
+                    }
+                
+                authenticated_as = 'api_key'
+                _logger.info(f"Blog creation authenticated via API key from IP: {request.httprequest.remote_addr}")
+                
+            else:
+                return {
+                    'status': 'error',
+                    'message': 'Authentication required. Provide "google_id" parameter (for website users) or "X-API-Key" header (for API access).'
+                }
+            
+            # ============================================================
+            # VALIDATION
+            # ============================================================
+            required_fields = ['title', 'excerpt', 'content', 'category', 'author_name']
+            missing_fields = [field for field in required_fields if not kwargs.get(field)]
+            
+            if missing_fields:
+                return {
+                    'status': 'error',
+                    'message': f'Missing required fields: {", ".join(missing_fields)}',
+                    'required_fields': required_fields
+                }
+            
+            # Validate category
+            valid_categories = ['ai_ml', 'automation', 'development', 'industry_news']
+            if kwargs.get('category') not in valid_categories:
+                return {
+                    'status': 'error',
+                    'message': f'Invalid category. Must be one of: {", ".join(valid_categories)}',
+                    'valid_categories': valid_categories
+                }
+            
+            # ============================================================
+            # IMAGE HANDLING (ALL IMAGES → S3)
+            # ============================================================
+            blog_vals = {
+                'title': kwargs['title'],
+                'excerpt': kwargs['excerpt'],
+                'content': kwargs['content'],
+                'category': kwargs['category'],
+                'author_name': kwargs['author_name'],
+                'author_avatar': kwargs.get('author_avatar', kwargs['author_name'][:2].upper()),
+                'publish_date': kwargs.get('publish_date', fields.Date.today()),
+                'read_time': kwargs.get('read_time', '5 min read'),
+                'featured': kwargs.get('featured', False),
+                'active': kwargs.get('active', True),
+                'seo_title': kwargs.get('seo_title'),
+                'seo_description': kwargs.get('seo_description'),
+                'seo_keywords': kwargs.get('seo_keywords'),
+            }
+            
+            # Custom slug (if provided, will be slugified and uniqueness checked)
+            if kwargs.get('slug'):
+                blog_vals['slug'] = kwargs['slug']
+            
+            # Handle preview image (automatically stored in S3 via fs_storage)
+            if kwargs.get('image_base64'):
+                try:
+                    # Validate and decode base64
+                    image_data = kwargs['image_base64']
+                    # Remove data URL prefix if present
+                    if 'base64,' in image_data:
+                        image_data = image_data.split('base64,')[1]
+                    
+                    # Decode to check validity
+                    decoded = base64.b64decode(image_data)
+                    
+                    # Check file size (limit to 10MB)
+                    size_mb = len(decoded) / (1024 * 1024)
+                    if size_mb > 10:
+                        return {
+                            'status': 'error',
+                            'message': f'Preview image too large ({size_mb:.2f}MB). Maximum allowed: 10MB.'
+                        }
+                    
+                    # Store as base64 string (Odoo Binary field format)
+                    blog_vals['image'] = image_data
+                    
+                except Exception as e:
+                    return {
+                        'status': 'error',
+                        'message': f'Invalid image_base64 format: {str(e)}'
+                    }
+            
+            # Handle OG image
+            if kwargs.get('og_image_base64'):
+                try:
+                    og_image_data = kwargs['og_image_base64']
+                    if 'base64,' in og_image_data:
+                        og_image_data = og_image_data.split('base64,')[1]
+                    
+                    decoded = base64.b64decode(og_image_data)
+                    size_mb = len(decoded) / (1024 * 1024)
+                    if size_mb > 10:
+                        return {
+                            'status': 'error',
+                            'message': f'OG image too large ({size_mb:.2f}MB). Maximum allowed: 10MB.'
+                        }
+                    
+                    blog_vals['og_image'] = og_image_data
+                    
+                except Exception as e:
+                    return {
+                        'status': 'error',
+                        'message': f'Invalid og_image_base64 format: {str(e)}'
+                    }
+            
+            # ============================================================
+            # TAG HANDLING
+            # ============================================================
+            if kwargs.get('tags'):
+                tag_names = kwargs['tags']
+                if not isinstance(tag_names, list):
+                    return {
+                        'status': 'error',
+                        'message': 'Tags must be a list of strings'
+                    }
+                
+                tag_ids = []
+                BlogTag = request.env['bbweb.blog.tag'].sudo()
+                
+                for tag_name in tag_names:
+                    if not isinstance(tag_name, str):
+                        continue
+                    
+                    tag_name = tag_name.strip()
+                    if not tag_name:
+                        continue
+                    
+                    # Find or create tag
+                    tag = BlogTag.search([('name', '=', tag_name)], limit=1)
+                    if not tag:
+                        tag = BlogTag.create({'name': tag_name})
+                        _logger.info(f"Created new blog tag: {tag_name}")
+                    
+                    tag_ids.append(tag.id)
+                
+                if tag_ids:
+                    blog_vals['tag_ids'] = [(6, 0, tag_ids)]
+            
+            # ============================================================
+            # CREATE BLOG POST
+            # ============================================================
+            BlogPost = request.env['bbweb.blog.post'].sudo()
+            blog = BlogPost.create(blog_vals)
+            
+            _logger.info(f"Blog post created successfully: ID={blog.id}, slug={blog.slug}, authenticated_as={authenticated_as}")
+            
+            # ============================================================
+            # RESPONSE
+            # ============================================================
+            return {
+                'status': 'success',
+                'message': 'Blog post created successfully',
+                'data': {
+                    'id': blog.id,
+                    'slug': blog.slug,
+                    'title': blog.title,
+                    'url': f'/blog/{blog.slug}',
+                    'author': blog.author_name,
+                    'category': blog.category,
+                    'publish_date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else None,
+                    'featured': blog.featured,
+                    'active': blog.active,
+                    'tags': [t.name for t in blog.tag_ids],
+                },
+                'authenticated_as': authenticated_as
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error creating blog post: {str(e)}", exc_info=True)
+            return {
+                'status': 'error',
+                'message': f'Failed to create blog post: {str(e)}'
+            }
