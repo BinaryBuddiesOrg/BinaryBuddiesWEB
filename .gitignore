@@ -280,3 +280,24 @@ storybook-static
 .svelte-kit
 
 # End of https://www.gitignore.io/api/node
+
+# =============================================================================
+# ODOO SPECIFIC
+# =============================================================================
+
+# Odoo environment files (contains secrets)
+odoo/.env
+
+# OCA modules (cloned from GitHub, not committed)
+# odoo/custom/storage/
+# odoo/custom/server-tools/
+# odoo/custom/server-env/
+
+# Python cache in Odoo modules
+odoo/custom/**/__pycache__/
+odoo/custom/**/*.pyc
+odoo/custom/**/*.pyo
+
+# Odoo data and logs
+odoo/data/
+odoo/logs/
