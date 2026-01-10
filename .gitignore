@@ -294,9 +294,9 @@ odoo/.env
 # odoo/custom/server-env/
 
 # Python cache in Odoo modules
-odoo/custom/**/__pycache__/
-odoo/custom/**/*.pyc
-odoo/custom/**/*.pyo
+# odoo/custom/**/__pycache__/
+# odoo/custom/**/*.pyc
+# odoo/custom/**/*.pyo
 
 # Odoo data and logs
 odoo/data/

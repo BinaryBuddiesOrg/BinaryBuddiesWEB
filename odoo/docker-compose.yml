@@ -1,39 +1,142 @@
+# =============================================================================
+# DOCKER COMPOSE - ODOO 18 WITH S3 STORAGE
+# Binary Buddies Web - Production Configuration
+# =============================================================================
+#
+# Usage:
+#   1. Copy .env.example to .env and fill in your values
+#   2. docker-compose build
+#   3. docker-compose up -d
+#
+# =============================================================================
+
 services:
+  # ===========================================================================
+  # ODOO APPLICATION SERVER
+  # ===========================================================================
   odoo:
-    image: odoo:18.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: bbweb-odoo
     depends_on:
-      - postgres-odoo
+      postgres-odoo:
+        condition: service_healthy
     network_mode: "host"
+
+    # -------------------------------------------------------------------------
+    # Environment Variables
+    # -------------------------------------------------------------------------
     environment:
+      # Database Connection
       - HOST=localhost
       - USER=odoo
       - PASSWORD=${ODOO_DB_PASSWORD:-odoo_password}
-      - DB_NAME=bbweb_odoo
-      - DOCKER_CONTAINER=true
-    volumes:
-      - odoo_data:/var/lib/odoo
-      - ./custom:/mnt/extra-addons
-    command: ["odoo", "--addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons", "--database=bbweb_odoo", "--without-demo=all", "--init=base,website", "--db_host=localhost", "--db_port=5432", "--xmlrpc-port=8069"]
-    restart: unless-stopped
 
-  # PostgreSQL for Odoo
+      # AWS S3 Credentials (used by fs_storage module)
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET:-binarybuddies-attachments}
+      - AWS_S3_REGION=${AWS_S3_REGION:-ap-south-1}
+
+      # CloudFront Domain (for CDN URLs)
+      - CLOUDFRONT_DOMAIN=${CLOUDFRONT_DOMAIN}
+
+      # Docker flag
+      - DOCKER_CONTAINER=true
+
+    # -------------------------------------------------------------------------
+    # Volume Mounts
+    # -------------------------------------------------------------------------
+    volumes:
+      # Odoo data persistence (filestore, sessions)
+      - odoo_data:/var/lib/odoo
+
+      # Odoo configuration file
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+
+      # Custom addons (includes all OCA modules)
+      - ./custom:/mnt/extra-addons:ro
+
+      # Logs (optional - for log persistence)
+      - odoo_logs:/var/log/odoo
+
+    # -------------------------------------------------------------------------
+    # Startup & Health
+    # -------------------------------------------------------------------------
+    restart: unless-stopped
+    # -------------------------------------------------------------------------
+    # Resource Limits (optional - uncomment for production)
+    # -------------------------------------------------------------------------
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2G
+    #     reservations:
+    #       memory: 512M
+
+    # ===========================================================================
+    # POSTGRESQL DATABASE
+    # ===========================================================================
   postgres-odoo:
     image: postgres:15-alpine
     container_name: bbweb-postgres-odoo
     network_mode: "host"
+
+    # -------------------------------------------------------------------------
+    # Environment
+    # -------------------------------------------------------------------------
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD:-odoo_password}
+      # Performance tuning
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+
+    # -------------------------------------------------------------------------
+    # Volumes
+    # -------------------------------------------------------------------------
     volumes:
       - postgres_odoo_data:/var/lib/postgresql/data
+
+    # -------------------------------------------------------------------------
+    # Health Check
+    # -------------------------------------------------------------------------
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U odoo -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
     restart: unless-stopped
 
+# =============================================================================
+# VOLUMES
+# =============================================================================
 volumes:
+  # Odoo filestore and session data
   odoo_data:
     driver: local
+
+  # PostgreSQL data
   postgres_odoo_data:
     driver: local
 
-# Networks removed - using host networking mode
+  # Odoo logs
+  odoo_logs:
+    driver: local
+
+# =============================================================================
+# NOTES
+# =============================================================================
+#
+# Using network_mode: "host" for direct localhost access.
+# For production behind reverse proxy, consider using bridge network.
+#
+# Ports (when using host network):
+#   - 8069: Odoo HTTP/RPC
+#   - 8072: Odoo Longpolling
+#   - 5432: PostgreSQL
+#
+# =============================================================================
