@@ -509,3 +509,69 @@ class BinaryBuddiesWebAPI(http.Controller):
             return self._json_response(seo_list)
         except Exception as e:
             return self._error_response(str(e), status=500)
+
+    # Website User Endpoints (for NextAuth integration)
+    @http.route('/api/bbweb/users/sync', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def sync_website_user(self, google_id=None, email=None, name=None, image_url=None, **kwargs):
+        """
+        Sync user from NextAuth on Google sign-in.
+        Called automatically when user logs in with Google.
+        """
+        try:
+            if not google_id or not email:
+                return {'status': 'error', 'message': 'Missing required fields: google_id and email'}
+            
+            WebsiteUser = request.env['bbweb.website.user'].sudo()
+            result = WebsiteUser.sync_user(
+                google_id=google_id,
+                email=email,
+                name=name or email.split('@')[0],
+                image_url=image_url
+            )
+            return result
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    @http.route('/api/bbweb/users/verify', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def verify_website_user(self, google_id=None, **kwargs):
+        """
+        Verify user exists and is not banned.
+        Used for protected actions like commenting.
+        """
+        try:
+            if not google_id:
+                return {'status': 'error', 'valid': False, 'message': 'Missing google_id'}
+            
+            WebsiteUser = request.env['bbweb.website.user'].sudo()
+            result = WebsiteUser.verify_user(google_id=google_id)
+            result['status'] = 'success'
+            return result
+        except Exception as e:
+            return {'status': 'error', 'valid': False, 'message': str(e)}
+
+    @http.route('/api/bbweb/users/<string:google_id>', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_website_user(self, google_id, **kwargs):
+        """Get website user by Google ID (public info only)"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            user = request.env['bbweb.website.user'].sudo().search([
+                ('google_id', '=', google_id),
+                ('active', '=', True)
+            ], limit=1)
+            
+            if not user:
+                return self._error_response('User not found', status=404)
+            
+            data = {
+                'id': user.id,
+                'name': user.name,
+                'image_url': user.image_url,
+                'can_comment': user.can_comment,
+                'can_author_blogs': user.can_author_blogs,
+                'is_banned': user.is_banned,
+            }
+            return self._json_response(data)
+        except Exception as e:
+            return self._error_response(str(e), status=500)

@@ -15,6 +15,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
+import { UserMenu } from "@/components/UserMenu";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -172,9 +173,9 @@ export const Navbar = () => {
             </div>
           )}
 
-          {/* Theme Toggle - Desktop */}
+          {/* User Menu - Desktop */}
           {!isMobile && (
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
@@ -187,6 +188,7 @@ export const Navbar = () => {
                   <Moon className="w-5 h-5 text-primary" />
                 )}
               </Button>
+              <UserMenu />
             </div>
           )}
 
@@ -286,6 +288,11 @@ export const Navbar = () => {
                       ))}
                     </motion.div>
                   </nav>
+
+                  {/* User Menu - Mobile */}
+                  <div className="py-2">
+                    <UserMenu />
+                  </div>
 
                   {/* Theme Toggle - Mobile */}
                   <div className="pt-4 pb-2">

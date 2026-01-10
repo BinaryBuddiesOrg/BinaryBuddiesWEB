@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         minimumCacheTTL: 60,
     },
-    
+
     // Compression
     compress: true,
 
@@ -93,12 +93,12 @@ const nextConfig: NextConfig = {
         ];
     },
 
-    // API rewrites to proxy Odoo backend
+    // API rewrites to proxy Odoo backend (bbweb routes only, auth handled by NextAuth)
     async rewrites() {
         return [
             {
-                source: '/api/:path*',
-                destination: 'http://localhost:8069/api/:path*',
+                source: '/api/bbweb/:path*',
+                destination: 'http://localhost:8069/api/bbweb/:path*',
             },
         ];
     },

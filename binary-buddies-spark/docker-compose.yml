@@ -10,4 +10,9 @@ services:
     environment:
       - NODE_ENV=production
       - ODOO_API_URL=${ODOO_API_URL:-http://localhost:8069}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_URL=${AUTH_URL:-http://localhost:6533}
+      - AUTH_TRUST_HOST=true
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     restart: unless-stopped
