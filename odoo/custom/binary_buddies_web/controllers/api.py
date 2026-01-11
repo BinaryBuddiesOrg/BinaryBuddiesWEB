@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import http
+from odoo import http, fields
 from odoo.http import request
+from odoo.tools import config
 import json
 
 
@@ -628,13 +629,15 @@ class BinaryBuddiesWebAPI(http.Controller):
                 _logger.info(f"Blog creation authenticated via session for user: {user.email}")
                 
             # API Key authentication (backend programs)
+            # Reads from odoo.conf: blog_api_key = your-key-here
             elif api_key:
-                expected_key = request.env['ir.config_parameter'].sudo().get_param('bbweb.blog_api_key')
+                # First try odoo.conf, then fall back to ir.config_parameter
+                expected_key = config.get('blog_api_key') or request.env['ir.config_parameter'].sudo().get_param('bbweb.blog_api_key')
                 
                 if not expected_key:
                     return {
                         'status': 'error',
-                        'message': 'API key authentication not configured. Please contact administrator.'
+                        'message': 'API key authentication not configured. Add blog_api_key to odoo.conf or set bbweb.blog_api_key in System Parameters.'
                     }
                 
                 if api_key != expected_key:
