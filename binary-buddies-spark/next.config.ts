@@ -20,12 +20,12 @@ const nextConfig: NextConfig = {
             {
                 protocol: 'http',
                 hostname: 'localhost',
-                port: '8069',
+                port: '6534',
             },
             {
                 protocol: 'http',
                 hostname: '127.0.0.1',
-                port: '8069',
+                port: '6534',
             },
         ],
         // Allow data URLs for base64 images from API (legacy support)
@@ -98,7 +98,7 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: '/api/bbweb/:path*',
-                destination: 'http://localhost:8069/api/bbweb/:path*',
+                destination: 'http://localhost:6534/api/bbweb/:path*',
             },
         ];
     },

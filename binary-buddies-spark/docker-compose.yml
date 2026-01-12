@@ -4,12 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - ODOO_API_URL=${ODOO_API_URL:-http://localhost:8069}
+        - ODOO_API_URL=${ODOO_API_URL:-http://localhost:6534}
     container_name: binary-buddies-web
     network_mode: "host"
     environment:
       - NODE_ENV=production
-      - ODOO_API_URL=${ODOO_API_URL:-http://localhost:8069}
+      - ODOO_API_URL=${ODOO_API_URL:-http://localhost:6534}
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_URL=${AUTH_URL:-http://localhost:6533}
       - AUTH_TRUST_HOST=true

@@ -135,7 +135,7 @@ volumes:
 # For production behind reverse proxy, consider using bridge network.
 #
 # Ports (when using host network):
-#   - 8069: Odoo HTTP/RPC
+#   - 6534: Odoo HTTP/RPC
 #   - 8072: Odoo Longpolling
 #   - 5432: PostgreSQL
 #

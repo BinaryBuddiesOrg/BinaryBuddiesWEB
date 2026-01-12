@@ -60,7 +60,7 @@ USER odoo
 # Healthcheck
 # -----------------------------------------------------------------------------
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8069/web/health || exit 1
+    CMD curl -f http://localhost:6534/web/health || exit 1
 
 # Default command uses the config file
 CMD ["odoo", "-c", "/etc/odoo/odoo.conf"]

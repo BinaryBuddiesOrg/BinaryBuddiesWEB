@@ -20,7 +20,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Accept build argument for API URL
-ARG ODOO_API_URL=http://localhost:8069
+ARG ODOO_API_URL=http://localhost:6534
 
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1

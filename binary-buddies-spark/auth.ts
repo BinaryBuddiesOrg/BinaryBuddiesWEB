@@ -12,7 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async signIn({ user, account }) {
             // Sync user to Odoo on every sign-in
             try {
-                const odooUrl = process.env.ODOO_API_URL || 'http://localhost:8069';
+                const odooUrl = process.env.ODOO_API_URL || 'http://localhost:6534';
                 const response = await fetch(`${odooUrl}/api/bbweb/users/sync`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

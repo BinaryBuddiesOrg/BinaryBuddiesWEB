@@ -19,22 +19,22 @@ function ensureAbsoluteUrl(url: string): string {
     if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
     }
-    
+
     // Check if we're in the browser (client-side)
     const isClient = typeof window !== 'undefined';
-    
+
     if (isClient) {
         // Client-side: Use relative URLs - Next.js rewrites will proxy to Odoo
         // This avoids CORS issues since requests go through the same origin
         return url;
     }
-    
+
     // Server-side: Use absolute URLs
-    // In Docker with network_mode: "host", localhost:8069 is accessible
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                   process.env.ODOO_API_URL || 
-                   'http://localhost:8069';
-    
+    // In Docker with network_mode: "host", localhost:6534 is accessible
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ||
+        process.env.ODOO_API_URL ||
+        'http://localhost:6534';
+
     // Remove leading slash if present to avoid double slashes
     const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
     return `${baseUrl}/${cleanUrl}`;
@@ -57,7 +57,7 @@ async function fetchApi<T>(url: string, options?: { skipError?: boolean }): Prom
     try {
         // Ensure absolute URL
         const absoluteUrl = ensureAbsoluteUrl(url);
-        
+
         // Add cache-busting timestamp to prevent browser caching (only at client-side)
         const isClient = typeof window !== 'undefined';
         let finalUrl = absoluteUrl;
@@ -88,14 +88,14 @@ async function fetchApi<T>(url: string, options?: { skipError?: boolean }): Prom
             } catch {
                 // If response is not JSON, use status text
             }
-            
+
             // Create a proper error with status code
             const error = new ApiRequestError(
                 errorMessage,
                 response.status,
                 response.statusText
             );
-            
+
             throw error;
         }
 
@@ -106,15 +106,15 @@ async function fetchApi<T>(url: string, options?: { skipError?: boolean }): Prom
         if (error instanceof ApiRequestError) {
             throw error;
         }
-        
+
         // Handle other errors (network errors, timeouts, etc.)
         console.error('API fetch error:', error);
-        
+
         if (options?.skipError) {
             // Return empty array/object based on expected type
             return [] as unknown as T;
         }
-        
+
         // Wrap non-ApiRequestError in ApiRequestError for consistent handling
         if (error instanceof Error) {
             throw new ApiRequestError(
@@ -123,7 +123,7 @@ async function fetchApi<T>(url: string, options?: { skipError?: boolean }): Prom
                 'Unknown'
             );
         }
-        
+
         throw error;
     }
 }
@@ -249,7 +249,7 @@ export async function incrementBlogView(blogId: number): Promise<{ status: strin
     const url = `${API_ENDPOINTS.blog(blogId)}/view`;
     const isClient = typeof window !== 'undefined';
     const absoluteUrl = isClient ? url : ensureAbsoluteUrl(url);
-    
+
     const response = await fetch(absoluteUrl, {
         method: 'POST',
         headers: {

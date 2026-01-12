@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ODOO_BLOG_API_KEY: str
     
     # Odoo Configuration
-    ODOO_URL: str = "http://localhost:8069"
+    ODOO_URL: str = "http://localhost:6534"
     
     # Automation Settings
     MAX_BLOGS_PER_RUN: int = 30
