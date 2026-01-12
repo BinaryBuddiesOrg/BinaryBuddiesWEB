@@ -83,3 +83,53 @@ export interface ApiError {
     status?: number;
     details?: unknown;
 }
+
+// Blog creation request
+export interface CreateBlogRequest {
+    title: string;
+    excerpt: string;
+    content: string; // HTML content
+    category: "ai_ml" | "automation" | "development" | "industry_news";
+    author_name: string;
+    author_avatar?: string;
+    slug?: string;
+    publish_date?: string;
+    read_time?: string;
+    tags?: string[];
+    featured?: boolean;
+    active?: boolean;
+    image_base64?: string; // Preview image
+    og_image_base64?: string; // OG image
+    seo_title?: string;
+    seo_description?: string;
+    seo_keywords?: string;
+}
+
+// Blog creation response
+export interface CreateBlogResponse {
+    status: "success" | "error";
+    message: string;
+    data?: {
+        id: number;
+        slug: string;
+        title: string;
+        url: string;
+        author: string;
+        category: string;
+        publish_date: string;
+        featured: boolean;
+        active: boolean;
+        tags: string[];
+    };
+    authenticated_as?: "session" | "api_key";
+}
+
+// User permissions (from /api/bbweb/users/<google_id>)
+export interface UserPermissions {
+    id: number;
+    name: string;
+    image_url: string | null;
+    can_comment: boolean;
+    can_author_blogs: boolean;
+    is_banned: boolean;
+}

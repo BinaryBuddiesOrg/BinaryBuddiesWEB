@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -11,10 +12,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Loader2 } from "lucide-react";
+import { User, LogOut, Loader2, PenSquare } from "lucide-react";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 export function UserMenu() {
     const { data: session, status } = useSession();
+    const { data: permissions } = useUserPermissions();
 
     if (status === "loading") {
         return (
@@ -45,6 +48,8 @@ export function UserMenu() {
         .toUpperCase()
         .slice(0, 2) || "U";
 
+    const canAuthorBlogs = permissions?.can_author_blogs ?? false;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -68,6 +73,14 @@ export function UserMenu() {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {canAuthorBlogs && (
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link href="/blog/create">
+                            <PenSquare className="mr-2 h-4 w-4" />
+                            Create Blog
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                     className="cursor-pointer text-destructive focus:text-destructive"
                     onClick={() => signOut()}

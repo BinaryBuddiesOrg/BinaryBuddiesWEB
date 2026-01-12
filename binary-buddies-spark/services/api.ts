@@ -9,6 +9,9 @@ import type {
     ApiTeamMember,
     ApiBlogPost,
     ApiCareer,
+    CreateBlogRequest,
+    CreateBlogResponse,
+    UserPermissions,
 } from '../types/api';
 
 // Helper to ensure absolute URL for fetch
@@ -334,4 +337,66 @@ export async function submitApplication(data: SubmitApplicationData): Promise<{ 
     }
 
     return result;
+}
+
+// ============================================================================
+// User Permissions
+// ============================================================================
+
+export async function fetchUserPermissions(googleId: string): Promise<UserPermissions | null> {
+    try {
+        const url = `/api/bbweb/users/${googleId}`;
+        return await fetchApi<UserPermissions>(url);
+    } catch {
+        return null;
+    }
+}
+
+// ============================================================================
+// Blog Creation
+// ============================================================================
+
+export async function createBlog(
+    request: CreateBlogRequest,
+    googleId: string
+): Promise<CreateBlogResponse> {
+    const isClient = typeof window !== 'undefined';
+    const url = isClient ? '/api/bbweb/blogs/create' : ensureAbsoluteUrl('/api/bbweb/blogs/create');
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: { ...request, google_id: googleId },
+            id: Date.now(),
+        }),
+    });
+
+    if (!response.ok) {
+        throw new ApiRequestError(
+            `Failed to create blog: ${response.statusText}`,
+            response.status,
+            response.statusText
+        );
+    }
+
+    const data = await response.json();
+
+    // Handle JSON-RPC response format
+    if (data.result) {
+        return data.result;
+    }
+
+    // Handle error responses
+    if (data.error) {
+        throw new ApiRequestError(
+            data.error.message || 'Failed to create blog',
+            data.error.code || 500,
+            'Error'
+        );
+    }
+
+    return data;
 }

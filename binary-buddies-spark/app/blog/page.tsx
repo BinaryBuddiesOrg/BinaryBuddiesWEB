@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Search, AlertCircle, ChevronLeft, ChevronRight, PenSquare } from "lucide-react";
 import { BlogCard } from "@/components/BlogCard";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { Footer } from "@/components/Footer";
@@ -16,6 +17,7 @@ import {
     PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useBlogs } from "@/hooks/useBlogs";
+import { useCanAuthorBlogs } from "@/hooks/useUserPermissions";
 import type { ApiBlogPost } from "@/types/api";
 import type { PaginatedBlogResponse } from "@/services/api";
 
@@ -25,10 +27,12 @@ export default function BlogPage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const canAuthorBlogs = useCanAuthorBlogs();
+
 
     // Reset to page 1 when category or search changes
     const categoryFilter = selectedCategory !== "All" ? selectedCategory : undefined;
-    
+
     // Fetch blogs with pagination
     const {
         data: blogsData,
@@ -46,12 +50,12 @@ export default function BlogPage() {
         if (!blogsData) {
             return { posts: [], pagination: null };
         }
-        
+
         if (Array.isArray(blogsData)) {
             // Legacy format - no pagination
             return { posts: blogsData, pagination: null };
         }
-        
+
         // Paginated format
         return {
             posts: blogsData.data || [],
@@ -70,7 +74,7 @@ export default function BlogPage() {
     }, [posts, searchQuery]);
 
     // Calculate total pages
-    const totalPages = pagination 
+    const totalPages = pagination
         ? Math.ceil(pagination.total / (pagination.limit || POSTS_PER_PAGE))
         : 1;
 
@@ -176,6 +180,23 @@ export default function BlogPage() {
                             />
                         </div>
                     </motion.div>
+
+                    {/* Create Blog Button (for authorized users) */}
+                    {canAuthorBlogs && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.8 }}
+                            className="mt-6"
+                        >
+                            <Link href="/blog/create">
+                                <Button className="gap-2">
+                                    <PenSquare className="h-4 w-4" />
+                                    Create Blog Post
+                                </Button>
+                            </Link>
+                        </motion.div>
+                    )}
                 </div>
             </section>
 
@@ -209,170 +230,169 @@ export default function BlogPage() {
             {/* Content - Show when not loading and no error */}
             {!isLoading && !error && (
                 <section className="py-16 md:py-24">
-                        <div className="container mx-auto px-4">
-                            {/* Category Filter */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6 }}
-                                className="flex flex-wrap gap-3 justify-center mb-12"
-                            >
-                                {categories.map((category) => (
-                                    <Button
-                                        key={category}
-                                        variant={selectedCategory === category ? "default" : "outline"}
-                                        onClick={() => handleCategoryChange(category)}
-                                        className={
-                                            selectedCategory === category
-                                                ? "bg-primary text-white hover:bg-primary/90 border-primary/50 shadow-sm"
-                                                : "glass"
-                                        }
-                                    >
-                                        {category}
-                                    </Button>
-                                ))}
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-center mb-8"
-                            >
-                                <p className="text-muted-foreground">
-                                    {searchQuery 
-                                        ? `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"} found`
-                                        : pagination
-                                            ? `Showing ${posts.length} of ${pagination.total} ${pagination.total === 1 ? "article" : "articles"} (Page ${currentPage} of ${totalPages})`
-                                            : `${posts.length} ${posts.length === 1 ? "article" : "articles"}`
+                    <div className="container mx-auto px-4">
+                        {/* Category Filter */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="flex flex-wrap gap-3 justify-center mb-12"
+                        >
+                            {categories.map((category) => (
+                                <Button
+                                    key={category}
+                                    variant={selectedCategory === category ? "default" : "outline"}
+                                    onClick={() => handleCategoryChange(category)}
+                                    className={
+                                        selectedCategory === category
+                                            ? "bg-primary text-white hover:bg-primary/90 border-primary/50 shadow-sm"
+                                            : "glass"
                                     }
-                                </p>
-                            </motion.div>
+                                >
+                                    {category}
+                                </Button>
+                            ))}
+                        </motion.div>
 
-                            {filteredPosts.length > 0 ? (
-                                <>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                        {filteredPosts.map((post, index) => (
-                                            <BlogCard key={post.id} post={post} index={index} />
-                                        ))}
-                                    </div>
-                                    
-                                    {/* Pagination - Only show when not searching and we have pagination info */}
-                                    {!searchQuery && pagination && totalPages > 1 && (
-                                        <div className="mt-16 flex justify-center">
-                                            <Pagination>
-                                                <PaginationContent className="flex items-center gap-2">
-                                                    <PaginationItem>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="default"
-                                                            onClick={() => {
-                                                                if (currentPage > 1) {
-                                                                    handlePageChange(currentPage - 1);
-                                                                }
-                                                            }}
-                                                            disabled={currentPage === 1}
-                                                            className="gap-2 px-4 py-2"
-                                                        >
-                                                            <ChevronLeft className="h-4 w-4" />
-                                                            <span>Previous</span>
-                                                        </Button>
-                                                    </PaginationItem>
-                                                    
-                                                    {/* Page Numbers */}
-                                                    {(() => {
-                                                        const pages: (number | 'ellipsis')[] = [];
-                                                        const showEllipsis = totalPages > 7;
-                                                        
-                                                        if (!showEllipsis) {
-                                                            // Show all pages if 7 or fewer
-                                                            for (let i = 1; i <= totalPages; i++) {
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-center mb-8"
+                        >
+                            <p className="text-muted-foreground">
+                                {searchQuery
+                                    ? `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"} found`
+                                    : pagination
+                                        ? `Showing ${posts.length} of ${pagination.total} ${pagination.total === 1 ? "article" : "articles"} (Page ${currentPage} of ${totalPages})`
+                                        : `${posts.length} ${posts.length === 1 ? "article" : "articles"}`
+                                }
+                            </p>
+                        </motion.div>
+
+                        {filteredPosts.length > 0 ? (
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {filteredPosts.map((post, index) => (
+                                        <BlogCard key={post.id} post={post} index={index} />
+                                    ))}
+                                </div>
+
+                                {/* Pagination - Only show when not searching and we have pagination info */}
+                                {!searchQuery && pagination && totalPages > 1 && (
+                                    <div className="mt-16 flex justify-center">
+                                        <Pagination>
+                                            <PaginationContent className="flex items-center gap-2">
+                                                <PaginationItem>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="default"
+                                                        onClick={() => {
+                                                            if (currentPage > 1) {
+                                                                handlePageChange(currentPage - 1);
+                                                            }
+                                                        }}
+                                                        disabled={currentPage === 1}
+                                                        className="gap-2 px-4 py-2"
+                                                    >
+                                                        <ChevronLeft className="h-4 w-4" />
+                                                        <span>Previous</span>
+                                                    </Button>
+                                                </PaginationItem>
+
+                                                {/* Page Numbers */}
+                                                {(() => {
+                                                    const pages: (number | 'ellipsis')[] = [];
+                                                    const showEllipsis = totalPages > 7;
+
+                                                    if (!showEllipsis) {
+                                                        // Show all pages if 7 or fewer
+                                                        for (let i = 1; i <= totalPages; i++) {
+                                                            pages.push(i);
+                                                        }
+                                                    } else {
+                                                        // Always show first page
+                                                        pages.push(1);
+
+                                                        if (currentPage <= 3) {
+                                                            // Show 1, 2, 3, 4, ..., last
+                                                            for (let i = 2; i <= 4; i++) {
+                                                                pages.push(i);
+                                                            }
+                                                            pages.push('ellipsis');
+                                                            pages.push(totalPages);
+                                                        } else if (currentPage >= totalPages - 2) {
+                                                            // Show 1, ..., last-3, last-2, last-1, last
+                                                            pages.push('ellipsis');
+                                                            for (let i = totalPages - 3; i <= totalPages; i++) {
                                                                 pages.push(i);
                                                             }
                                                         } else {
-                                                            // Always show first page
-                                                            pages.push(1);
-                                                            
-                                                            if (currentPage <= 3) {
-                                                                // Show 1, 2, 3, 4, ..., last
-                                                                for (let i = 2; i <= 4; i++) {
-                                                                    pages.push(i);
-                                                                }
-                                                                pages.push('ellipsis');
-                                                                pages.push(totalPages);
-                                                            } else if (currentPage >= totalPages - 2) {
-                                                                // Show 1, ..., last-3, last-2, last-1, last
-                                                                pages.push('ellipsis');
-                                                                for (let i = totalPages - 3; i <= totalPages; i++) {
-                                                                    pages.push(i);
-                                                                }
-                                                            } else {
-                                                                // Show 1, ..., current-1, current, current+1, ..., last
-                                                                pages.push('ellipsis');
-                                                                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-                                                                    pages.push(i);
-                                                                }
-                                                                pages.push('ellipsis');
-                                                                pages.push(totalPages);
+                                                            // Show 1, ..., current-1, current, current+1, ..., last
+                                                            pages.push('ellipsis');
+                                                            for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                                                                pages.push(i);
                                                             }
+                                                            pages.push('ellipsis');
+                                                            pages.push(totalPages);
                                                         }
-                                                        
-                                                        return pages.map((item, index) => {
-                                                            if (item === 'ellipsis') {
-                                                                return (
-                                                                    <PaginationItem key={`ellipsis-${index}`}>
-                                                                        <PaginationEllipsis />
-                                                                    </PaginationItem>
-                                                                );
-                                                            }
+                                                    }
+
+                                                    return pages.map((item, index) => {
+                                                        if (item === 'ellipsis') {
                                                             return (
-                                                                <PaginationItem key={item}>
-                                                                    <Button
-                                                                        variant={currentPage === item ? "default" : "outline"}
-                                                                        size="icon"
-                                                                        onClick={() => handlePageChange(item)}
-                                                                        className={`h-10 w-10 ${
-                                                                            currentPage === item 
-                                                                                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                                                                : "hover:bg-muted"
-                                                                        }`}
-                                                                    >
-                                                                        {item}
-                                                                    </Button>
+                                                                <PaginationItem key={`ellipsis-${index}`}>
+                                                                    <PaginationEllipsis />
                                                                 </PaginationItem>
                                                             );
-                                                        });
-                                                    })()}
-                                                    
-                                                    <PaginationItem>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="default"
-                                                            onClick={() => {
-                                                                if (currentPage < totalPages) {
-                                                                    handlePageChange(currentPage + 1);
-                                                                }
-                                                            }}
-                                                            disabled={currentPage === totalPages}
-                                                            className="gap-2 px-4 py-2"
-                                                        >
-                                                            <span>Next</span>
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        </Button>
-                                                    </PaginationItem>
-                                                </PaginationContent>
-                                            </Pagination>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="text-center py-16">
-                                    <p className="text-muted-foreground text-lg">
-                                        No articles found matching your criteria. Try a different search or category.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </section>
+                                                        }
+                                                        return (
+                                                            <PaginationItem key={item}>
+                                                                <Button
+                                                                    variant={currentPage === item ? "default" : "outline"}
+                                                                    size="icon"
+                                                                    onClick={() => handlePageChange(item)}
+                                                                    className={`h-10 w-10 ${currentPage === item
+                                                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                                                        : "hover:bg-muted"
+                                                                        }`}
+                                                                >
+                                                                    {item}
+                                                                </Button>
+                                                            </PaginationItem>
+                                                        );
+                                                    });
+                                                })()}
+
+                                                <PaginationItem>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="default"
+                                                        onClick={() => {
+                                                            if (currentPage < totalPages) {
+                                                                handlePageChange(currentPage + 1);
+                                                            }
+                                                        }}
+                                                        disabled={currentPage === totalPages}
+                                                        className="gap-2 px-4 py-2"
+                                                    >
+                                                        <span>Next</span>
+                                                        <ChevronRight className="h-4 w-4" />
+                                                    </Button>
+                                                </PaginationItem>
+                                            </PaginationContent>
+                                        </Pagination>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="text-center py-16">
+                                <p className="text-muted-foreground text-lg">
+                                    No articles found matching your criteria. Try a different search or category.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </section>
             )}
 
             <Footer />
