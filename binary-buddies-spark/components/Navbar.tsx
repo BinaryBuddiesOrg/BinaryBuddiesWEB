@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Menu, ChevronDown, Sun, Moon } from "lucide-react";
+import { Menu, ChevronDown, Sun, Moon, PenSquare } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 import { UserMenu } from "@/components/UserMenu";
+import { useCanAuthorBlogs } from "@/hooks/useUserPermissions";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -39,6 +40,7 @@ export const Navbar = () => {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
+  const canAuthorBlogs = useCanAuthorBlogs();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -176,6 +178,19 @@ export const Navbar = () => {
           {/* User Menu - Desktop */}
           {!isMobile && (
             <div className="hidden md:flex items-center gap-2">
+              {canAuthorBlogs && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 gap-2"
+                >
+                  <Link href="/blog/create">
+                    <PenSquare className="w-4 h-4" />
+                    <span className="hidden lg:inline">Create Blog</span>
+                  </Link>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -231,29 +246,52 @@ export const Navbar = () => {
                     </span>
                   </div>
 
-                  {/* Mobile Navigation Items */}
-                  <nav className="flex flex-col gap-2 flex-1">
-                    {navItems.map((item, index) => (
-                      <motion.div
-                        key={item.path}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Link
-                          href={item.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300",
-                            isActive(item.path)
-                              ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
-                              : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                          )}
+                    {/* Mobile Navigation Items */}
+                    <nav className="flex flex-col gap-2 flex-1">
+                      {navItems.map((item, index) => (
+                        <motion.div
+                          key={item.path}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
                         >
-                          {item.name}
-                        </Link>
-                      </motion.div>
-                    ))}
+                          <Link
+                            href={item.path}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cn(
+                              "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300",
+                              isActive(item.path)
+                                ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
+                                : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                            )}
+                          >
+                            {item.name}
+                          </Link>
+                        </motion.div>
+                      ))}
+
+                      {/* Create Blog - Mobile */}
+                      {canAuthorBlogs && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: navItems.length * 0.1 }}
+                        >
+                          <Link
+                            href="/blog/create"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cn(
+                              "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 gap-2 flex items-center",
+                              isActive("/blog/create")
+                                ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
+                                : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                            )}
+                          >
+                            <PenSquare className="w-4 h-4" />
+                            <span>Create Blog</span>
+                          </Link>
+                        </motion.div>
+                      )}
 
                     {/* Services Section in Mobile */}
                     <motion.div
