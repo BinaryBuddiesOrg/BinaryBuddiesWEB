@@ -73,6 +73,12 @@ export function UserMenu() {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        My Profile
+                    </Link>
+                </DropdownMenuItem>
                 {canAuthorBlogs && (
                     <DropdownMenuItem asChild className="cursor-pointer">
                         <Link href="/blog/create">
@@ -81,6 +87,7 @@ export function UserMenu() {
                         </Link>
                     </DropdownMenuItem>
                 )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                     className="cursor-pointer text-destructive focus:text-destructive"
                     onClick={() => signOut()}
@@ -92,3 +99,4 @@ export function UserMenu() {
         </DropdownMenu>
     );
 }
+

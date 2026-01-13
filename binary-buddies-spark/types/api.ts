@@ -133,3 +133,165 @@ export interface UserPermissions {
     can_author_blogs: boolean;
     is_banned: boolean;
 }
+
+// ============================================================================
+// COMMENTS TYPES
+// ============================================================================
+
+// Comment user info (embedded in comment)
+export interface CommentUser {
+    id: number;
+    name: string;
+    image_url: string | null;
+}
+
+// Single comment from API
+export interface ApiComment {
+    id: number;
+    content: string;
+    user: CommentUser;
+    parent_id: number | null;
+    depth: number;
+    like_count: number;
+    reply_count: number;
+    is_liked: boolean;
+    is_own: boolean;
+    is_edited: boolean;
+    edited_at: string | null;
+    is_deleted: boolean;
+    created_at: string;
+}
+
+// Paginated comments response (keyset pagination)
+export interface PaginatedComments {
+    comments: ApiComment[];
+    pagination: {
+        next_cursor: string | null;
+        has_more: boolean;
+        total_count: number;
+    };
+}
+
+// Create comment request
+export interface CreateCommentRequest {
+    google_id: string;
+    content: string;
+    parent_id?: number;
+}
+
+// Create comment response
+export interface CreateCommentResponse {
+    status: "success" | "error";
+    message?: string;
+    comment?: ApiComment;
+}
+
+// Edit comment request
+export interface EditCommentRequest {
+    google_id: string;
+    content: string;
+}
+
+// Edit comment response
+export interface EditCommentResponse {
+    status: "success" | "error";
+    message?: string;
+    comment?: {
+        id: number;
+        content: string;
+        is_edited: boolean;
+        edited_at: string | null;
+    };
+}
+
+// Delete comment response
+export interface DeleteCommentResponse {
+    status: "success" | "error";
+    message?: string;
+}
+
+// ============================================================================
+// LIKES TYPES
+// ============================================================================
+
+// Toggle like response (for both blogs and comments)
+export interface ToggleLikeResponse {
+    status: "success" | "error";
+    message?: string;
+    is_liked?: boolean;
+    like_count?: number;
+}
+
+// Blog engagement data (combined stats)
+export interface ApiBlogEngagement {
+    like_count: number;
+    comment_count: number;
+    view_count: number;
+    is_liked: boolean;
+}
+
+// ============================================================================
+// USER PROFILE TYPES
+// ============================================================================
+
+// User profile stats
+export interface UserProfileStats {
+    total_comments: number;
+    total_likes_given: number;
+    authored_blogs_count: number;
+}
+
+// Full user profile
+export interface ApiUserProfile {
+    id: number;
+    name: string;
+    email: string;
+    image_url: string | null;
+    member_since: string | null;
+    can_comment: boolean;
+    can_author_blogs: boolean;
+    is_banned: boolean;
+    stats: UserProfileStats;
+}
+
+// User comment with blog reference (for profile page)
+export interface ApiUserComment {
+    id: number;
+    content: string;
+    blog: {
+        id: number;
+        title: string;
+        slug: string;
+    };
+    like_count: number;
+    created_at: string;
+}
+
+// Paginated user comments response
+export interface PaginatedUserComments {
+    comments: ApiUserComment[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        has_more: boolean;
+    };
+}
+
+// Liked blog item (with additional metadata)
+export interface ApiLikedBlog extends ApiBlogPost {
+    like_count: number;
+    comment_count: number;
+    liked_at: string;
+}
+
+// Paginated liked blogs response
+export interface PaginatedLikedBlogs {
+    data: ApiLikedBlog[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        has_more: boolean;
+    };
+}

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Blog Like List View -->
+    <record id="view_blog_like_tree" model="ir.ui.view">
+        <field name="name">bbweb.blog.like.list</field>
+        <field name="model">bbweb.blog.like</field>
+        <field name="arch" type="xml">
+            <list string="Blog Likes">
+                <field name="blog_id"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Blog Like Form View -->
+    <record id="view_blog_like_form" model="ir.ui.view">
+        <field name="name">bbweb.blog.like.form</field>
+        <field name="model">bbweb.blog.like</field>
+        <field name="arch" type="xml">
+            <form string="Blog Like">
+                <sheet>
+                    <group>
+                        <group string="Like Details">
+                            <field name="blog_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Timestamp">
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Blog Like Search View -->
+    <record id="view_blog_like_search" model="ir.ui.view">
+        <field name="name">bbweb.blog.like.search</field>
+        <field name="model">bbweb.blog.like</field>
+        <field name="arch" type="xml">
+            <search string="Search Blog Likes">
+                <field name="blog_id"/>
+                <field name="user_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Blog Post" name="group_by_blog" context="{'group_by': 'blog_id'}"/>
+                    <filter string="User" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Blog Like Action -->
+    <record id="action_blog_like" model="ir.actions.act_window">
+        <field name="name">Blog Likes</field>
+        <field name="res_model">bbweb.blog.like</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_blog_like_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No blog likes yet!
+            </p>
+            <p>
+                Likes will appear here when users like blog posts.
+            </p>
+        </field>
+    </record>
+
+    <!-- Comment Like List View -->
+    <record id="view_comment_like_tree" model="ir.ui.view">
+        <field name="name">bbweb.comment.like.list</field>
+        <field name="model">bbweb.comment.like</field>
+        <field name="arch" type="xml">
+            <list string="Comment Likes">
+                <field name="comment_id"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Comment Like Form View -->
+    <record id="view_comment_like_form" model="ir.ui.view">
+        <field name="name">bbweb.comment.like.form</field>
+        <field name="model">bbweb.comment.like</field>
+        <field name="arch" type="xml">
+            <form string="Comment Like">
+                <sheet>
+                    <group>
+                        <group string="Like Details">
+                            <field name="comment_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Timestamp">
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Comment Like Search View -->
+    <record id="view_comment_like_search" model="ir.ui.view">
+        <field name="name">bbweb.comment.like.search</field>
+        <field name="model">bbweb.comment.like</field>
+        <field name="arch" type="xml">
+            <search string="Search Comment Likes">
+                <field name="comment_id"/>
+                <field name="user_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Comment" name="group_by_comment" context="{'group_by': 'comment_id'}"/>
+                    <filter string="User" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Comment Like Action -->
+    <record id="action_comment_like" model="ir.actions.act_window">
+        <field name="name">Comment Likes</field>
+        <field name="res_model">bbweb.comment.like</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_comment_like_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No comment likes yet!
+            </p>
+            <p>
+                Likes will appear here when users like comments.
+            </p>
+        </field>
+    </record>
+</odoo>

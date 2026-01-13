@@ -821,3 +821,488 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'status': 'error',
                 'message': f'Failed to create blog post: {str(e)}'
             }
+
+    # =========================================================================
+    # COMMENTS API ENDPOINTS
+    # =========================================================================
+
+    @http.route('/api/bbweb/blogs/<int:blog_id>/comments', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_comments(self, blog_id, cursor=None, limit=20, **kwargs):
+        """Get comments for a blog post with keyset pagination"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            # Parse limit
+            try:
+                limit = min(int(limit), 50)  # Max 50 per request
+            except (ValueError, TypeError):
+                limit = 20
+            
+            # Get current user if authenticated
+            current_user_id = None
+            google_id = kwargs.get('google_id')
+            if google_id:
+                user = request.env['bbweb.website.user'].sudo().search([
+                    ('google_id', '=', google_id),
+                    ('active', '=', True),
+                ], limit=1)
+                if user:
+                    current_user_id = user.id
+            
+            # Fetch comments with pagination
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            result = Comment.get_comments_paginated(
+                blog_id=blog_id,
+                parent_id=None,  # Root comments only
+                limit=limit,
+                cursor=cursor,
+                current_user_id=current_user_id,
+            )
+            
+            return self._json_response(result)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/comments/<int:comment_id>/replies', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_comment_replies(self, comment_id, cursor=None, limit=10, **kwargs):
+        """Get replies for a comment with keyset pagination"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            # Parse limit
+            try:
+                limit = min(int(limit), 50)
+            except (ValueError, TypeError):
+                limit = 10
+            
+            # Get parent comment's blog_id
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            parent = Comment.browse(comment_id)
+            if not parent.exists():
+                return self._error_response('Comment not found', status=404)
+            
+            # Get current user if authenticated
+            current_user_id = None
+            google_id = kwargs.get('google_id')
+            if google_id:
+                user = request.env['bbweb.website.user'].sudo().search([
+                    ('google_id', '=', google_id),
+                    ('active', '=', True),
+                ], limit=1)
+                if user:
+                    current_user_id = user.id
+            
+            # Fetch replies
+            result = Comment.get_comments_paginated(
+                blog_id=parent.blog_id.id,
+                parent_id=comment_id,
+                limit=limit,
+                cursor=cursor,
+                current_user_id=current_user_id,
+            )
+            
+            return self._json_response(result)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/blogs/<int:blog_id>/comments', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def create_comment(self, blog_id, google_id=None, content=None, parent_id=None, **kwargs):
+        """Create a new comment on a blog post"""
+        try:
+            if not google_id:
+                return {'status': 'error', 'message': 'Authentication required'}
+            
+            if not content or not content.strip():
+                return {'status': 'error', 'message': 'Comment content is required'}
+            
+            # Validate user
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return {'status': 'error', 'message': 'User not found'}
+            if user.is_banned:
+                return {'status': 'error', 'message': 'You are banned from commenting'}
+            if not user.can_comment:
+                return {'status': 'error', 'message': 'You do not have permission to comment'}
+            
+            # Create comment
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            result = Comment.create_comment(
+                blog_id=blog_id,
+                user_id=user.id,
+                content=content.strip(),
+                parent_id=parent_id,
+            )
+            
+            return {
+                'status': 'success',
+                'comment': result,
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    @http.route('/api/bbweb/comments/<int:comment_id>', type='json', auth='public', methods=['PUT'], csrf=False, cors='*')
+    def edit_comment(self, comment_id, google_id=None, content=None, **kwargs):
+        """Edit an existing comment"""
+        try:
+            if not google_id:
+                return {'status': 'error', 'message': 'Authentication required'}
+            
+            if not content or not content.strip():
+                return {'status': 'error', 'message': 'Comment content is required'}
+            
+            # Validate user
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return {'status': 'error', 'message': 'User not found'}
+            
+            # Get comment
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            comment = Comment.browse(comment_id)
+            if not comment.exists():
+                return {'status': 'error', 'message': 'Comment not found'}
+            
+            # Edit comment (will validate ownership)
+            comment.edit_comment(user.id, content.strip())
+            
+            return {
+                'status': 'success',
+                'message': 'Comment updated',
+                'comment': {
+                    'id': comment.id,
+                    'content': comment.content,
+                    'is_edited': comment.is_edited,
+                    'edited_at': comment.edited_at.isoformat() if comment.edited_at else None,
+                }
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    @http.route('/api/bbweb/comments/<int:comment_id>', type='json', auth='public', methods=['DELETE'], csrf=False, cors='*')
+    def delete_comment(self, comment_id, google_id=None, **kwargs):
+        """Soft-delete a comment"""
+        try:
+            if not google_id:
+                return {'status': 'error', 'message': 'Authentication required'}
+            
+            # Validate user
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return {'status': 'error', 'message': 'User not found'}
+            
+            # Get comment
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            comment = Comment.browse(comment_id)
+            if not comment.exists():
+                return {'status': 'error', 'message': 'Comment not found'}
+            
+            # Soft delete (will validate ownership)
+            comment.soft_delete(user.id)
+            
+            return {'status': 'success', 'message': 'Comment deleted'}
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    # =========================================================================
+    # LIKES API ENDPOINTS
+    # =========================================================================
+
+    @http.route('/api/bbweb/blogs/<int:blog_id>/like', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def toggle_blog_like(self, blog_id, google_id=None, **kwargs):
+        """Toggle like on a blog post"""
+        try:
+            if not google_id:
+                return {'status': 'error', 'message': 'Authentication required'}
+            
+            # Validate user
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return {'status': 'error', 'message': 'User not found'}
+            if user.is_banned:
+                return {'status': 'error', 'message': 'You are banned from liking content'}
+            
+            # Toggle like
+            BlogLike = request.env['bbweb.blog.like'].sudo()
+            result = BlogLike.toggle_like(blog_id, user.id)
+            
+            return {
+                'status': 'success',
+                **result,
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    @http.route('/api/bbweb/blogs/<int:blog_id>/engagement', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_engagement(self, blog_id, google_id=None, **kwargs):
+        """Get blog engagement stats (likes, comments, views)"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            Blog = request.env['bbweb.blog.post'].sudo()
+            blog = Blog.browse(blog_id)
+            if not blog.exists() or not blog.active:
+                return self._error_response('Blog post not found', status=404)
+            
+            # Check if current user liked the blog
+            is_liked = False
+            if google_id:
+                user = request.env['bbweb.website.user'].sudo().search([
+                    ('google_id', '=', google_id),
+                    ('active', '=', True),
+                ], limit=1)
+                if user:
+                    BlogLike = request.env['bbweb.blog.like'].sudo()
+                    existing_like = BlogLike.search([
+                        ('blog_id', '=', blog_id),
+                        ('user_id', '=', user.id),
+                    ], limit=1)
+                    is_liked = bool(existing_like)
+            
+            return self._json_response({
+                'like_count': blog.like_count,
+                'comment_count': blog.comment_count,
+                'view_count': blog.view_count,
+                'is_liked': is_liked,
+            })
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/comments/<int:comment_id>/like', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def toggle_comment_like(self, comment_id, google_id=None, **kwargs):
+        """Toggle like on a comment"""
+        try:
+            if not google_id:
+                return {'status': 'error', 'message': 'Authentication required'}
+            
+            # Validate user
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return {'status': 'error', 'message': 'User not found'}
+            if user.is_banned:
+                return {'status': 'error', 'message': 'You are banned from liking content'}
+            
+            # Toggle like
+            CommentLike = request.env['bbweb.comment.like'].sudo()
+            result = CommentLike.toggle_like(comment_id, user.id)
+            
+            return {
+                'status': 'success',
+                **result,
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    # =========================================================================
+    # USER PROFILE API ENDPOINTS
+    # =========================================================================
+
+    @http.route('/api/bbweb/users/<string:google_id>/profile', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_user_profile(self, google_id, **kwargs):
+        """Get full user profile with stats"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return self._error_response('User not found', status=404)
+            
+            # Count authored blogs (if user has authored any)
+            authored_blogs_count = 0
+            if user.can_author_blogs:
+                Blog = request.env['bbweb.blog.post'].sudo()
+                # Count blogs where author_name matches user's name (loose matching)
+                authored_blogs_count = Blog.search_count([
+                    ('active', '=', True),
+                ])  # Note: Would need proper author_user_id field for accurate count
+            
+            return self._json_response({
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'image_url': user.image_url,
+                'member_since': user.first_login.isoformat() if user.first_login else None,
+                'can_comment': user.can_comment,
+                'can_author_blogs': user.can_author_blogs,
+                'is_banned': user.is_banned,
+                'stats': {
+                    'total_comments': user.total_comments,
+                    'total_likes_given': user.total_likes_given,
+                    'authored_blogs_count': authored_blogs_count,
+                }
+            })
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/users/<string:google_id>/comments', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_user_comments(self, google_id, page=1, limit=20, **kwargs):
+        """Get comments made by a user (paginated)"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            # Parse pagination
+            try:
+                page = max(1, int(page))
+                limit = min(int(limit), 50)
+            except (ValueError, TypeError):
+                page = 1
+                limit = 20
+            
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return self._error_response('User not found', status=404)
+            
+            # Get user's comments (excluding deleted)
+            Comment = request.env['bbweb.blog.comment'].sudo()
+            domain = [
+                ('user_id', '=', user.id),
+                ('is_deleted', '=', False),
+                ('active', '=', True),
+            ]
+            
+            total_count = Comment.search_count(domain)
+            offset = (page - 1) * limit
+            comments = Comment.search(domain, order='create_date desc', limit=limit, offset=offset)
+            
+            result = []
+            for comment in comments:
+                result.append({
+                    'id': comment.id,
+                    'content': comment.content,
+                    'blog': {
+                        'id': comment.blog_id.id,
+                        'title': comment.blog_id.title,
+                        'slug': comment.blog_id.slug,
+                    },
+                    'like_count': comment.like_count,
+                    'created_at': comment.create_date.isoformat() if comment.create_date else None,
+                })
+            
+            return self._json_response({
+                'comments': result,
+                'pagination': {
+                    'total': total_count,
+                    'page': page,
+                    'limit': limit,
+                    'has_more': offset + len(comments) < total_count,
+                }
+            })
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/users/<string:google_id>/liked-blogs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_user_liked_blogs(self, google_id, page=1, limit=10, **kwargs):
+        """Get blogs liked by a user (paginated)"""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            
+            # Parse pagination
+            try:
+                page = max(1, int(page))
+                limit = min(int(limit), 50)
+            except (ValueError, TypeError):
+                page = 1
+                limit = 10
+            
+            User = request.env['bbweb.website.user'].sudo()
+            user = User.search([
+                ('google_id', '=', google_id),
+                ('active', '=', True),
+            ], limit=1)
+            
+            if not user:
+                return self._error_response('User not found', status=404)
+            
+            # Get user's likes
+            BlogLike = request.env['bbweb.blog.like'].sudo()
+            domain = [('user_id', '=', user.id)]
+            
+            total_count = BlogLike.search_count(domain)
+            offset = (page - 1) * limit
+            likes = BlogLike.search(domain, order='create_date desc', limit=limit, offset=offset)
+            
+            # Get blog data
+            Blog = request.env['bbweb.blog.post'].sudo()
+            category_map = {
+                'ai_ml': 'AI/ML',
+                'automation': 'Automation',
+                'development': 'Development',
+                'industry_news': 'Industry News',
+            }
+            
+            result = []
+            for like in likes:
+                blog = like.blog_id
+                if blog.exists() and blog.active:
+                    has_image = bool(blog.image)
+                    image_url = blog._get_image_url(has_image, blog.id)
+                    
+                    result.append({
+                        'id': str(blog.id),
+                        'title': blog.title,
+                        'slug': blog.slug,
+                        'excerpt': blog.excerpt,
+                        'category': category_map.get(blog.category, blog.category),
+                        'author': {
+                            'name': blog.author_name,
+                            'avatar': blog.author_avatar or blog.author_name[:2].upper(),
+                        },
+                        'date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else '',
+                        'readTime': blog.read_time,
+                        'image': image_url,
+                        'like_count': blog.like_count,
+                        'comment_count': blog.comment_count,
+                        'liked_at': like.create_date.isoformat() if like.create_date else None,
+                    })
+            
+            return self._json_response({
+                'data': result,
+                'pagination': {
+                    'total': total_count,
+                    'page': page,
+                    'limit': limit,
+                    'has_more': offset + len(likes) < total_count,
+                }
+            })
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+

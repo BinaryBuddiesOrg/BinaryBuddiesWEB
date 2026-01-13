@@ -27,3 +27,9 @@ access_bbweb_website_page_seo_user,bbweb.website.page.seo.user,model_bbweb_websi
 access_bbweb_website_page_seo_public,bbweb.website.page.seo.public,model_bbweb_website_page_seo,base.group_public,1,0,0,0
 access_bbweb_website_user_user,bbweb.website.user.user,model_bbweb_website_user,base.group_user,1,1,1,1
 access_bbweb_website_user_public,bbweb.website.user.public,model_bbweb_website_user,base.group_public,1,1,1,0
+access_bbweb_blog_comment_user,bbweb.blog.comment.user,model_bbweb_blog_comment,base.group_user,1,1,1,1
+access_bbweb_blog_comment_public,bbweb.blog.comment.public,model_bbweb_blog_comment,base.group_public,1,1,1,0
+access_bbweb_blog_like_user,bbweb.blog.like.user,model_bbweb_blog_like,base.group_user,1,1,1,1
+access_bbweb_blog_like_public,bbweb.blog.like.public,model_bbweb_blog_like,base.group_public,1,1,1,0
+access_bbweb_comment_like_user,bbweb.comment.like.user,model_bbweb_comment_like,base.group_user,1,1,1,1
+access_bbweb_comment_like_public,bbweb.comment.like.public,model_bbweb_comment_like,base.group_public,1,1,1,0

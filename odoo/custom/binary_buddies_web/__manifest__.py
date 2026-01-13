@@ -37,6 +37,8 @@ All endpoints are publicly accessible and return JSON data.
         'views/featured_project_views.xml',
         'views/team_member_views.xml',
         'views/blog_post_views.xml',
+        'views/blog_comment_views.xml',
+        'views/like_views.xml',
         'views/career_views.xml',
         'views/lead_views.xml',
         'views/job_application_views.xml',

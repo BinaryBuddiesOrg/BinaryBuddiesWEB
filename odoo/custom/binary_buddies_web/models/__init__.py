@@ -14,4 +14,7 @@ from . import lead
 from . import job_application
 from . import website_page_seo
 from . import website_user
+from . import blog_comment
+from . import blog_like
+from . import comment_like
 

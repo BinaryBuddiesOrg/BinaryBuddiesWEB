@@ -10,6 +10,8 @@ import { Breadcrumbs } from "@/components/SEO/Breadcrumbs";
 import { BlogViewTracker } from "@/components/BlogViewTracker";
 import { BlogImage } from "@/components/BlogImage";
 import { BlogContentWithScripts } from "@/components/BlogContentWithScripts";
+import { LikeButton } from "@/components/LikeButton";
+import { CommentSection } from "@/components/comments";
 import { fetchBlogBySlug, fetchBlogs, fetchBlog, ApiRequestError } from "@/services/api";
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@/lib/schema";
 import type { ApiBlogPost } from "@/types/api";
@@ -27,16 +29,16 @@ export async function generateStaticParams() {
         if (!featuredPosts) {
             return [];
         }
-        
+
         // Handle both array and paginated response formats
-        const posts = Array.isArray(featuredPosts) 
-            ? featuredPosts 
+        const posts = Array.isArray(featuredPosts)
+            ? featuredPosts
             : featuredPosts.data || [];
-        
+
         if (posts.length === 0) {
             return [];
         }
-        
+
         return posts.slice(0, 10).map((post) => ({
             slug: post.slug,
         }));
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     try {
         const resolvedParams = await params;
         const slug = resolvedParams?.slug;
-        
+
         // Validate slug - ensure it's a valid string
         if (!slug || typeof slug !== 'string' || slug.trim() === '' || slug === 'false' || slug === 'true') {
             console.error('Invalid slug in generateMetadata:', slug, 'params:', resolvedParams);
@@ -60,9 +62,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
                 robots: { index: false, follow: false },
             };
         }
-        
+
         const post = await fetchBlogBySlug(slug);
-        
+
         if (!post) {
             return {
                 title: 'Blog Post Not Found',
@@ -136,17 +138,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
     let post: ApiBlogPost | null = null;
     let relatedPosts: ApiBlogPost[] = [];
-    
+
     try {
         const resolvedParams = await params;
         const slug = resolvedParams?.slug;
-        
+
         // Validate slug - ensure it's a valid string
         if (!slug || typeof slug !== 'string' || slug.trim() === '' || slug === 'false' || slug === 'true') {
             console.error('Invalid slug in page component:', slug, 'params:', resolvedParams);
             notFound();
         }
-        
+
         // Check if slug is actually a numeric ID (for backward compatibility)
         // If so, fetch by ID and redirect to the actual slug
         const slugAsNumber = parseInt(slug, 10);
@@ -165,20 +167,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             // If no post found or no slug, show 404
             notFound();
         }
-        
+
         // Normal slug-based lookup
         post = await fetchBlogBySlug(slug);
-        
+
         // Fetch related articles (same category, excluding current post)
         if (post) {
             try {
                 const allPosts = await fetchBlogs({ category: post.category, skipError: true });
-                
+
                 // Handle both array and paginated response formats
-                const posts = Array.isArray(allPosts) 
-                    ? allPosts 
+                const posts = Array.isArray(allPosts)
+                    ? allPosts
                     : allPosts.data || [];
-                
+
                 relatedPosts = posts
                     .filter(p => p.id !== post!.id && p.slug !== post!.slug)
                     .slice(0, 3);
@@ -239,7 +241,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                 { label: post.title, href: `/blog/${post.slug}` },
                             ]}
                         />
-                        
+
                         {/* Back Link */}
                         <Link
                             href="/blog"
@@ -250,16 +252,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         </Link>
 
                         {/* Preview Image - Only show if image exists */}
-            {previewImage && (
-                <div className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden bg-muted/10">
-                    <BlogImage
-                        src={previewImage}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                        priority={true}
-                    />
-                </div>
-            )}
+                        {previewImage && (
+                            <div className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden bg-muted/10">
+                                <BlogImage
+                                    src={previewImage}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                    priority={true}
+                                />
+                            </div>
+                        )}
 
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -331,7 +333,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                         {/* Share Section */}
                         <div className="mt-12 pt-8 border-t border-border flex flex-wrap justify-between items-center gap-4">
-                            <p className="text-muted-foreground font-medium">Share this article</p>
+                            <div className="flex items-center gap-4">
+                                <p className="text-muted-foreground font-medium">Share this article</p>
+                                <LikeButton blogId={parseInt(post.id)} size="lg" />
+                            </div>
                             <div className="flex gap-2">
                                 <BlogShareButton
                                     title={post.title}
@@ -340,6 +345,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                 />
                             </div>
                         </div>
+
+                        {/* Comments Section */}
+                        <CommentSection blogId={parseInt(post.id)} />
 
                         {/* Related Articles */}
                         <RelatedArticles relatedPosts={relatedPosts} />

@@ -89,6 +89,14 @@ class BlogPost(models.Model):
     # View count for analytics
     view_count = fields.Integer(string='View Count', default=0, help='Number of times this blog post has been viewed')
     
+    # Engagement counts (denormalized for performance - updated by likes/comments on create/unlink)
+    like_count = fields.Integer(string='Like Count', default=0, index=True, help='Number of likes on this blog post')
+    comment_count = fields.Integer(string='Comment Count', default=0, help='Number of comments on this blog post')
+    
+    # Relationships to comments and likes
+    comment_ids = fields.One2many('bbweb.blog.comment', 'blog_id', string='Comments')
+    like_ids = fields.One2many('bbweb.blog.like', 'blog_id', string='Likes')
+    
     _sql_constraints = [
         ('slug_unique', 'UNIQUE(slug)', 'The slug must be unique!'),
     ]

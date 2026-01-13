@@ -12,6 +12,16 @@ import type {
     CreateBlogRequest,
     CreateBlogResponse,
     UserPermissions,
+    ApiComment,
+    PaginatedComments,
+    CreateCommentResponse,
+    EditCommentResponse,
+    DeleteCommentResponse,
+    ToggleLikeResponse,
+    ApiBlogEngagement,
+    ApiUserProfile,
+    PaginatedUserComments,
+    PaginatedLikedBlogs,
 } from '../types/api';
 
 // Helper to ensure absolute URL for fetch
@@ -399,4 +409,237 @@ export async function createBlog(
     }
 
     return data;
+}
+
+// ============================================================================
+// COMMENTS API
+// ============================================================================
+
+/**
+ * Fetch comments for a blog post with cursor pagination
+ */
+export async function fetchComments(
+    blogId: number,
+    options?: {
+        cursor?: string;
+        limit?: number;
+        googleId?: string;
+    }
+): Promise<PaginatedComments> {
+    const params: Record<string, string> = {};
+    if (options?.cursor) params.cursor = options.cursor;
+    if (options?.limit) params.limit = String(options.limit);
+    if (options?.googleId) params.google_id = options.googleId;
+
+    const url = buildUrl(API_ENDPOINTS.blogComments(blogId), params);
+    return fetchApi<PaginatedComments>(url);
+}
+
+/**
+ * Fetch replies for a comment with cursor pagination
+ */
+export async function fetchReplies(
+    commentId: number,
+    options?: {
+        cursor?: string;
+        limit?: number;
+        googleId?: string;
+    }
+): Promise<PaginatedComments> {
+    const params: Record<string, string> = {};
+    if (options?.cursor) params.cursor = options.cursor;
+    if (options?.limit) params.limit = String(options.limit);
+    if (options?.googleId) params.google_id = options.googleId;
+
+    const url = buildUrl(API_ENDPOINTS.commentReplies(commentId), params);
+    return fetchApi<PaginatedComments>(url);
+}
+
+/**
+ * Create a new comment on a blog post
+ */
+export async function createComment(
+    blogId: number,
+    googleId: string,
+    content: string,
+    parentId?: number
+): Promise<CreateCommentResponse> {
+    const response = await fetch(ensureAbsoluteUrl(API_ENDPOINTS.blogComments(blogId)), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+                google_id: googleId,
+                content,
+                parent_id: parentId,
+            },
+            id: Date.now(),
+        }),
+    });
+
+    const data = await response.json();
+    return data.result || data;
+}
+
+/**
+ * Edit an existing comment
+ */
+export async function editComment(
+    commentId: number,
+    googleId: string,
+    content: string
+): Promise<EditCommentResponse> {
+    const response = await fetch(ensureAbsoluteUrl(API_ENDPOINTS.comment(commentId)), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+                google_id: googleId,
+                content,
+            },
+            id: Date.now(),
+        }),
+    });
+
+    const data = await response.json();
+    return data.result || data;
+}
+
+/**
+ * Delete (soft-delete) a comment
+ */
+export async function deleteComment(
+    commentId: number,
+    googleId: string
+): Promise<DeleteCommentResponse> {
+    const response = await fetch(ensureAbsoluteUrl(API_ENDPOINTS.comment(commentId)), {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+                google_id: googleId,
+            },
+            id: Date.now(),
+        }),
+    });
+
+    const data = await response.json();
+    return data.result || data;
+}
+
+// ============================================================================
+// LIKES API
+// ============================================================================
+
+/**
+ * Toggle like on a blog post
+ */
+export async function toggleBlogLike(
+    blogId: number,
+    googleId: string
+): Promise<ToggleLikeResponse> {
+    const response = await fetch(ensureAbsoluteUrl(API_ENDPOINTS.blogLike(blogId)), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+                google_id: googleId,
+            },
+            id: Date.now(),
+        }),
+    });
+
+    const data = await response.json();
+    return data.result || data;
+}
+
+/**
+ * Toggle like on a comment
+ */
+export async function toggleCommentLike(
+    commentId: number,
+    googleId: string
+): Promise<ToggleLikeResponse> {
+    const response = await fetch(ensureAbsoluteUrl(API_ENDPOINTS.commentLike(commentId)), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+                google_id: googleId,
+            },
+            id: Date.now(),
+        }),
+    });
+
+    const data = await response.json();
+    return data.result || data;
+}
+
+/**
+ * Fetch blog engagement stats (likes, comments, views)
+ */
+export async function fetchBlogEngagement(
+    blogId: number,
+    googleId?: string
+): Promise<ApiBlogEngagement> {
+    const params: Record<string, string> = {};
+    if (googleId) params.google_id = googleId;
+
+    const url = buildUrl(API_ENDPOINTS.blogEngagement(blogId), params);
+    return fetchApi<ApiBlogEngagement>(url);
+}
+
+// ============================================================================
+// USER PROFILE API
+// ============================================================================
+
+/**
+ * Fetch user profile with stats
+ */
+export async function fetchUserProfile(
+    googleId: string
+): Promise<ApiUserProfile> {
+    return fetchApi<ApiUserProfile>(API_ENDPOINTS.userProfile(googleId));
+}
+
+/**
+ * Fetch comments made by a user
+ */
+export async function fetchUserComments(
+    googleId: string,
+    page = 1,
+    limit = 20
+): Promise<PaginatedUserComments> {
+    const params = {
+        page: String(page),
+        limit: String(limit),
+    };
+    const url = buildUrl(API_ENDPOINTS.userComments(googleId), params);
+    return fetchApi<PaginatedUserComments>(url);
+}
+
+/**
+ * Fetch blogs liked by a user
+ */
+export async function fetchUserLikedBlogs(
+    googleId: string,
+    page = 1,
+    limit = 10
+): Promise<PaginatedLikedBlogs> {
+    const params = {
+        page: String(page),
+        limit: String(limit),
+    };
+    const url = buildUrl(API_ENDPOINTS.userLikedBlogs(googleId), params);
+    return fetchApi<PaginatedLikedBlogs>(url);
 }

@@ -33,6 +33,24 @@ class WebsiteUser(models.Model):
     can_author_blogs = fields.Boolean('Can Author Blogs', default=False,
                                      help='Allow user to create blog posts')
 
+    # Relationships to user activity
+    comment_ids = fields.One2many('bbweb.blog.comment', 'user_id', string='Comments')
+    blog_like_ids = fields.One2many('bbweb.blog.like', 'user_id', string='Blog Likes')
+    comment_like_ids = fields.One2many('bbweb.comment.like', 'user_id', string='Comment Likes')
+
+    # Profile stats (computed)
+    total_comments = fields.Integer('Total Comments', compute='_compute_profile_stats', store=True)
+    total_likes_given = fields.Integer('Total Likes Given', compute='_compute_profile_stats', store=True)
+
+    @api.depends('comment_ids', 'comment_ids.is_deleted', 'blog_like_ids', 'comment_like_ids')
+    def _compute_profile_stats(self):
+        """Compute profile statistics for user dashboard"""
+        for user in self:
+            # Count non-deleted comments
+            user.total_comments = len(user.comment_ids.filtered(lambda c: not c.is_deleted))
+            # Count total likes given (blogs + comments)
+            user.total_likes_given = len(user.blog_like_ids) + len(user.comment_like_ids)
+
     # Constraints
     _sql_constraints = [
         ('google_id_unique', 'UNIQUE(google_id)', 'Google ID must be unique!'),

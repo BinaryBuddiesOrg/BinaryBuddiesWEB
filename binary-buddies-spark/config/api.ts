@@ -31,6 +31,21 @@ export const API_ENDPOINTS = {
     careers: `${API_BASE_URL}/api/bbweb/careers`,
     career: (id: number) => `${API_BASE_URL}/api/bbweb/careers/${id}`,
 
+    // Comments
+    blogComments: (blogId: number) => `${API_BASE_URL}/api/bbweb/blogs/${blogId}/comments`,
+    commentReplies: (commentId: number) => `${API_BASE_URL}/api/bbweb/comments/${commentId}/replies`,
+    comment: (commentId: number) => `${API_BASE_URL}/api/bbweb/comments/${commentId}`,
+    commentLike: (commentId: number) => `${API_BASE_URL}/api/bbweb/comments/${commentId}/like`,
+
+    // Blog Likes & Engagement
+    blogLike: (blogId: number) => `${API_BASE_URL}/api/bbweb/blogs/${blogId}/like`,
+    blogEngagement: (blogId: number) => `${API_BASE_URL}/api/bbweb/blogs/${blogId}/engagement`,
+
+    // User Profile
+    userProfile: (googleId: string) => `${API_BASE_URL}/api/bbweb/users/${googleId}/profile`,
+    userComments: (googleId: string) => `${API_BASE_URL}/api/bbweb/users/${googleId}/comments`,
+    userLikedBlogs: (googleId: string) => `${API_BASE_URL}/api/bbweb/users/${googleId}/liked-blogs`,
+
     // Applications
     applicationsCreate: `${API_BASE_URL}/api/bbweb/applications/create`,
 } as const;
@@ -61,7 +76,7 @@ const detectImageMimeType = (base64: string): string => {
     // PNG: iVBORw0KGgoAAAANSUhEUgAA...
     // WebP: UklGR...
     const trimmed = base64.trim();
-    
+
     if (trimmed.startsWith('/9j/') || trimmed.startsWith('/9j/4AAQ')) {
         return 'image/jpeg';
     }
@@ -81,26 +96,26 @@ export const base64ToDataUrl = (base64: string | null, mimeType?: string): strin
     if (!base64 || typeof base64 !== 'string') {
         return null;
     }
-    
+
     // Remove any whitespace
     const cleanBase64 = base64.trim();
-    
+
     // Check if empty after trimming
     if (cleanBase64 === '') {
         return null;
     }
-    
+
     // Check if it's already a data URL
     if (cleanBase64.startsWith('data:')) {
         return cleanBase64;
     }
-    
+
     // Auto-detect MIME type if not provided
     const detectedMimeType = mimeType || detectImageMimeType(cleanBase64);
-    
+
     // Convert base64 to data URL
     const dataUrl = `data:${detectedMimeType};base64,${cleanBase64}`;
-    
+
     // Debug logging (only in development)
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         if (cleanBase64.length < 100) {
@@ -110,6 +125,6 @@ export const base64ToDataUrl = (base64: string | null, mimeType?: string): strin
             });
         }
     }
-    
+
     return dataUrl;
 };

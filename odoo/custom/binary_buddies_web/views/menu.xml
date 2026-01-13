@@ -20,12 +20,39 @@
               action="action_bbweb_team_member"
               sequence="20"/>
 
+    <!-- Blog Menu (Parent) -->
+    <menuitem id="menu_blog_root"
+              name="Blog"
+              parent="menu_bbweb_root"
+              sequence="30"/>
+
     <!-- Blog Posts Menu -->
     <menuitem id="menu_bbweb_blog"
               name="Blog Posts"
-              parent="menu_bbweb_root"
+              parent="menu_blog_root"
               action="action_bbweb_blog_post"
+              sequence="10"/>
+
+    <!-- Blog Comments Menu -->
+    <menuitem id="menu_blog_comment"
+              name="Comments"
+              parent="menu_blog_root"
+              action="action_blog_comment"
+              sequence="20"/>
+
+    <!-- Blog Likes Menu -->
+    <menuitem id="menu_blog_like"
+              name="Blog Likes"
+              parent="menu_blog_root"
+              action="action_blog_like"
               sequence="30"/>
+
+    <!-- Comment Likes Menu -->
+    <menuitem id="menu_comment_like"
+              name="Comment Likes"
+              parent="menu_blog_root"
+              action="action_comment_like"
+              sequence="40"/>
 
     <!-- Career Listings Menu -->
     <menuitem id="menu_bbweb_careers"
