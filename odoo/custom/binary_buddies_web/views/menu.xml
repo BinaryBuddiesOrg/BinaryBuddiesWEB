@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Main Menu -->
-    <menuitem id="menu_bbweb_root"
-              name="Binary Buddies Web"
-              sequence="10"
-              web_icon="binary_buddies_web,static/description/icon.png"/>
-
     <!-- Featured Projects Menu -->
     <menuitem id="menu_bbweb_projects"
               name="Featured Projects"

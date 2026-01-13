@@ -34,6 +34,7 @@ All endpoints are publicly accessible and return JSON data.
     'depends': ['base', 'web'],
     'data': [
         'security/ir.model.access.csv',
+        'views/menu_root.xml',
         'views/featured_project_views.xml',
         'views/team_member_views.xml',
         'views/blog_post_views.xml',
