@@ -100,6 +100,10 @@ const nextConfig: NextConfig = {
                 source: '/api/bbweb/:path*',
                 destination: 'http://localhost:6534/api/bbweb/:path*',
             },
+            {
+                source: '/app-ads.txt',
+                destination: 'http://localhost:6534/app-ads.txt',
+            },
         ];
     },
 };

@@ -17,4 +17,5 @@ from . import website_user
 from . import blog_comment
 from . import blog_like
 from . import comment_like
+from . import app_ads_txt
 

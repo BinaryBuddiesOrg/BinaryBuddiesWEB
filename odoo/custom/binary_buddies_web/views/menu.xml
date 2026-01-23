@@ -90,4 +90,10 @@
               parent="menu_bbweb_config"
               action="action_bbweb_website_page_seo"
               sequence="30"/>
+
+    <menuitem id="menu_bbweb_app_ads_txt"
+              name="App-ads.txt"
+              parent="menu_bbweb_config"
+              action="action_app_ads_txt"
+              sequence="40"/>
 </odoo>
