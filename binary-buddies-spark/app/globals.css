@@ -2,101 +2,121 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap');
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
 
 @layer base {
     :root {
-        /* Light Mode Colors */
-        --background: 0 0% 98%;
-        --foreground: 0 0% 10%;
+        /* Font Variables */
+        --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-lexend: 'Lexend', system-ui, -apple-system, sans-serif;
+
+        /* Light Mode - Exact Supabase Tokens */
+        --background: 0 0% 99%;
+        /* #FCFCFC */
+        --foreground: 0 0% 9%;
+        /* #171717 */
 
         --card: 0 0% 100%;
-        --card-foreground: 0 0% 10%;
+        /* #FFFFFF */
+        --card-foreground: 0 0% 9%;
 
         --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 10%;
+        --popover-foreground: 0 0% 9%;
 
-        --primary: 142 76% 36%;
-        --primary-foreground: 0 0% 100%;
+        --primary: 153 60% 53%;
+        /* #3ECF8E Supabase Green */
+        --primary-foreground: 153 30% 10%;
 
-        --primary-glow: 142 76% 46%;
-        --accent-neon: 217 91% 60%;
-        --accent-pink: 142 76% 36%;
+        --primary-glow: 153 60% 63%;
+        --accent-neon: 153 60% 53%;
+        --accent-pink: 153 60% 53%;
 
-        --secondary: 0 0% 96%;
-        --secondary-foreground: 0 0% 10%;
+        --secondary: 0 0% 94%;
+        /* #F0F0F0 */
+        --secondary-foreground: 0 0% 9%;
 
         --muted: 0 0% 96%;
-        --muted-foreground: 0 0% 45%;
+        /* #F5F5F5 */
+        --muted-foreground: 0 0% 32%;
+        /* #525252 Paragraph/Muted */
 
-        --accent: 217 91% 60%;
+        --accent: 0 0% 9%;
         --accent-foreground: 0 0% 100%;
 
         --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
+        --destructive-foreground: 210 40% 98%;
 
-        --border: 0 0% 90%;
-        --input: 0 0% 90%;
-        --ring: 142 76% 36%;
+        --border: 0 0% 87%;
+        /* #DFDFDF Subtle borders */
+        --input: 0 0% 87%;
+        --ring: 153 60% 53%;
 
         --radius: 0.75rem;
+        /* 12px for modern technical look */
 
-        --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(217 91% 60%));
-        --gradient-radial: radial-gradient(circle at top, hsl(142 76% 36% / 0.15), transparent 70%);
-        --gradient-hero: radial-gradient(ellipse at top, hsl(142 76% 36% / 0.2), transparent 60%),
-            radial-gradient(ellipse at bottom right, hsl(217 91% 60% / 0.15), transparent 50%);
+        --gradient-primary: linear-gradient(135deg, hsl(153 60% 53%), hsl(153 60% 43%));
+        --gradient-radial: radial-gradient(circle at top, hsl(153 60% 53% / 0.1), transparent 70%);
+        --gradient-hero: radial-gradient(ellipse at top, hsl(153 60% 53% / 0.05), transparent 60%);
 
-        --shadow-glow: 0 0 40px hsl(142 76% 36% / 0.3);
-        --shadow-glow-strong: 0 0 60px hsl(142 76% 36% / 0.5);
-        --shadow-neon: 0 0 30px hsl(217 91% 60% / 0.4);
+        --shadow-glow: none;
+        --shadow-glow-strong: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+        --shadow-neon: none;
 
-        --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .dark {
-        /* Dark Mode Colors */
-        --background: 0 0% 4%;
+        /* Dark Mode - Exact Supabase Tokens */
+        --background: 0 0% 7%;
+        /* #121212 Base */
         --foreground: 0 0% 98%;
+        /* #FAFAFA Headings */
 
-        --card: 0 0% 7%;
+        --card: 0 0% 9%;
+        /* #171717 Card Surface */
         --card-foreground: 0 0% 98%;
 
-        --popover: 0 0% 7%;
+        --popover: 0 0% 9%;
         --popover-foreground: 0 0% 98%;
 
-        --primary: 142 76% 36%;
-        --primary-foreground: 0 0% 4%;
+        --primary: 153 60% 53%;
+        /* #3ECF8E Supabase Green */
+        --primary-foreground: 153 30% 5%;
 
-        --primary-glow: 142 76% 46%;
-        --accent-neon: 217 91% 60%;
-        --accent-pink: 142 76% 36%;
+        --primary-glow: 153 60% 63%;
+        --accent-neon: 153 60% 53%;
+        --accent-pink: 153 60% 53%;
 
-        --secondary: 0 0% 15%;
+        --secondary: 0 0% 12%;
+        /* #1F1F1F */
         --secondary-foreground: 0 0% 98%;
 
-        --muted: 0 0% 15%;
-        --muted-foreground: 0 0% 65%;
+        --muted: 0 0% 12%;
+        --muted-foreground: 0 0% 54%;
+        /* #898989 Para Text */
 
-        --accent: 217 91% 60%;
-        --accent-foreground: 0 0% 4%;
+        --accent: 0 0% 15%;
+        --accent-foreground: 0 0% 98%;
 
-        --destructive: 0 84.2% 60.2%;
+        --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 0% 98%;
 
-        --border: 0 0% 15%;
-        --input: 0 0% 15%;
-        --ring: 142 76% 36%;
+        --border: 0 0% 18%;
+        /* #2E2E2E Thin technical borders */
+        --input: 0 0% 18%;
+        --ring: 153 60% 53%;
 
-        --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(217 91% 60%));
-        --gradient-radial: radial-gradient(circle at top, hsl(142 76% 36% / 0.15), transparent 70%);
-        --gradient-hero: radial-gradient(ellipse at top, hsl(142 76% 36% / 0.2), transparent 60%),
-            radial-gradient(ellipse at bottom right, hsl(217 91% 60% / 0.15), transparent 50%);
+        --gradient-primary: linear-gradient(135deg, hsl(153 60% 53%), hsl(153 60% 43%));
+        --gradient-radial: radial-gradient(circle at top, hsl(153 60% 53% / 0.1), transparent 70%);
+        --gradient-hero: radial-gradient(ellipse at top, hsl(153 60% 53% / 0.15), transparent 60%);
 
-        --shadow-glow: 0 0 40px hsl(142 76% 36% / 0.3);
-        --shadow-glow-strong: 0 0 60px hsl(142 76% 36% / 0.5);
-        --shadow-neon: 0 0 30px hsl(217 91% 60% / 0.4);
+        --shadow-glow: none;
+        --shadow-glow-strong: none;
+        --shadow-neon: none;
     }
 }
 
@@ -105,8 +125,17 @@ All colors MUST be HSL.
         @apply border-border;
     }
 
+    .font-inter {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .font-lexend {
+        font-family: 'Lexend', system-ui, -apple-system, sans-serif;
+    }
+
     body {
         @apply bg-background text-foreground antialiased;
+        font-feature-settings: "rlig" 1, "calt" 1;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -325,6 +354,7 @@ All colors MUST be HSL.
 }
 
 @media (max-width: 768px) {
+
     .adsterra-ad-container,
     .adsterra-ad-iframe,
     .adsterra-ad-placeholder {
@@ -395,7 +425,7 @@ All colors MUST be HSL.
     .adsterra-ad-container {
         max-width: 100% !important;
     }
-    
+
     .adsterra-ad-iframe {
         max-width: 100% !important;
     }

@@ -10,13 +10,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { 
-    Share2, 
-    Twitter, 
-    Facebook, 
-    Linkedin, 
-    MessageCircle, 
-    Mail, 
+import {
+    Share2,
+    Twitter,
+    Facebook,
+    Linkedin,
+    MessageCircle,
+    Mail,
     Copy,
     Check
 } from "lucide-react";
@@ -125,49 +125,49 @@ export function BlogShareButton({ title, excerpt, url }: BlogShareButtonProps) {
                         <DropdownMenuSeparator />
                     </>
                 )}
-                <DropdownMenuItem 
-                    onClick={() => handleShare('twitter')} 
+                <DropdownMenuItem
+                    onClick={() => handleShare('twitter')}
                     className="cursor-pointer"
                 >
                     <Twitter className="mr-2 h-4 w-4" />
                     Twitter
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                    onClick={() => handleShare('facebook')} 
+                <DropdownMenuItem
+                    onClick={() => handleShare('facebook')}
                     className="cursor-pointer"
                 >
                     <Facebook className="mr-2 h-4 w-4" />
                     Facebook
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                    onClick={() => handleShare('linkedin')} 
+                <DropdownMenuItem
+                    onClick={() => handleShare('linkedin')}
                     className="cursor-pointer"
                 >
                     <Linkedin className="mr-2 h-4 w-4" />
                     LinkedIn
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                    onClick={() => handleShare('whatsapp')} 
+                <DropdownMenuItem
+                    onClick={() => handleShare('whatsapp')}
                     className="cursor-pointer"
                 >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     WhatsApp
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                    onClick={() => handleShare('email')} 
+                <DropdownMenuItem
+                    onClick={() => handleShare('email')}
                     className="cursor-pointer"
                 >
                     <Mail className="mr-2 h-4 w-4" />
                     Email
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                    onClick={handleCopyLink} 
+                <DropdownMenuItem
+                    onClick={handleCopyLink}
                     className="cursor-pointer"
                 >
                     {copied ? (
                         <>
-                            <Check className="mr-2 h-4 w-4 text-green-500" />
+                            <Check className="mr-2 h-4 w-4 text-primary" />
                             Copied!
                         </>
                     ) : (

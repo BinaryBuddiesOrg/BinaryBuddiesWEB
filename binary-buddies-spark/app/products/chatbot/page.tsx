@@ -402,7 +402,7 @@ export default function Chatbot() {
                                     <div className="flex gap-1.5">
                                         <div className="w-3 h-3 rounded-full bg-red-500/80" />
                                         <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                                        <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                                        <div className="w-3 h-3 rounded-full bg-primary/80" />
                                     </div>
                                     <span className="text-sm text-muted-foreground ml-2">index.html</span>
                                 </div>

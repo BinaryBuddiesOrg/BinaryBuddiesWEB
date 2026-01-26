@@ -9,11 +9,9 @@ import CookieConsent from '@/components/CookieConsent';
 import { SchemaMarkup } from '@/components/SEO/SchemaMarkup';
 import { generateOrganizationSchema } from '@/lib/schema';
 
-const inter = Inter({ subsets: ['latin'] });
-const lexend = Lexend({
-    subsets: ['latin'],
-    variable: '--font-lexend',
-});
+// Fallback to system fonts or standard web fonts to avoid build-time fetch errors in restricted environments
+const inter = { className: 'font-inter' };
+const lexend = { variable: 'font-lexend' };
 
 export const metadata: Metadata = {
     title: 'Binary Buddies - AI & Software Solutions',

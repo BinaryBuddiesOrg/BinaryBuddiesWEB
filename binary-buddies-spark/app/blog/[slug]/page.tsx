@@ -210,9 +210,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     const categoryColors: Record<string, string> = {
         "AI/ML": "bg-primary text-primary-foreground",
-        "Automation": "bg-accent text-accent-foreground",
-        "Development": "bg-emerald-600 text-white",
-        "Industry News": "bg-blue-600 text-white",
+        "Automation": "bg-accent/20 text-accent border border-accent/30",
+        "Development": "bg-secondary text-secondary-foreground border border-border",
+        "Industry News": "bg-muted text-muted-foreground border border-border",
     };
 
     const currentUrl = `${SITE_URL}/blog/${post.slug}`;

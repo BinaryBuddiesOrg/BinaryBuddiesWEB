@@ -139,9 +139,9 @@ export const ApplicationModal = ({ job, isOpen, onClose }: ApplicationModalProps
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4"
+                                        className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4"
                                     >
-                                        <CheckCircle className="w-10 h-10 text-green-500" />
+                                        <CheckCircle className="w-10 h-10 text-primary" />
                                     </motion.div>
                                     <h3 className="text-2xl font-bold mb-2">Application Submitted!</h3>
                                     <p className="text-muted-foreground">
