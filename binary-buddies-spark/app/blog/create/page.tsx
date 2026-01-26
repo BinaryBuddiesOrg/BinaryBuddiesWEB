@@ -14,7 +14,7 @@ export const metadata = {
 
 function BlogCreateSkeleton() {
     return (
-        <div className="container max-w-4xl py-8 space-y-6">
+        <div className="container max-w-4xl pt-24 pb-8 md:pt-32 space-y-6">
             <Skeleton className="h-10 w-48" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-24 w-full" />

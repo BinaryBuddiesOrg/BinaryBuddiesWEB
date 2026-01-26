@@ -148,7 +148,7 @@ export default function BlogCreateForm() {
     // Show loading state while checking permissions
     if (status === 'loading' || permissionsLoading) {
         return (
-            <div className="container max-w-4xl py-16 flex items-center justify-center">
+            <div className="container max-w-4xl pt-24 pb-16 md:pt-32 flex items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
@@ -163,7 +163,7 @@ export default function BlogCreateForm() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="container max-w-4xl py-8"
+            className="container max-w-4xl pt-24 pb-16 md:pt-32"
         >
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
