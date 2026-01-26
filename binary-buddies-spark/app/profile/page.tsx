@@ -75,8 +75,8 @@ export default function ProfilePage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                                        ? 'border-primary text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
                                     <tab.icon className="h-4 w-4" />
@@ -132,7 +132,7 @@ function ProfileHeader({
                     className="w-20 h-20 rounded-full"
                 />
             ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-20 h-20 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground text-2xl font-bold">
                     {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
             )}
@@ -182,24 +182,24 @@ function OverviewTab({ googleId }: { googleId?: string }) {
         <div className="space-y-8">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {/* Comments Card */}
-                <div className="p-6 rounded-xl border border-border bg-card">
+                <div className="p-6 rounded-xl border border-border bg-card/50">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                            <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <div className="p-2 rounded-lg bg-primary/10">
+                            <MessageCircle className="h-5 w-5 text-primary" />
                         </div>
-                        <h3 className="font-semibold">Comments</h3>
+                        <h3 className="font-semibold text-foreground">Comments</h3>
                     </div>
                     <p className="text-3xl font-bold">{profile?.stats?.total_comments ?? 0}</p>
                     <p className="text-sm text-muted-foreground">Total comments posted</p>
                 </div>
 
                 {/* Likes Card */}
-                <div className="p-6 rounded-xl border border-border bg-card">
+                <div className="p-6 rounded-xl border border-border bg-card/50">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-                            <Heart className="h-5 w-5 text-red-600 dark:text-red-400" />
+                        <div className="p-2 rounded-lg bg-primary/10">
+                            <Heart className="h-5 w-5 text-primary" />
                         </div>
-                        <h3 className="font-semibold">Likes Given</h3>
+                        <h3 className="font-semibold text-foreground">Likes Given</h3>
                     </div>
                     <p className="text-3xl font-bold">{profile?.stats?.total_likes_given ?? 0}</p>
                     <p className="text-sm text-muted-foreground">Posts you&apos;ve liked</p>
@@ -207,12 +207,12 @@ function OverviewTab({ googleId }: { googleId?: string }) {
 
                 {/* Blogs Card (if can author) */}
                 {profile?.can_author_blogs && (
-                    <div className="p-6 rounded-xl border border-border bg-card">
+                    <div className="p-6 rounded-xl border border-border bg-card/50">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
-                                <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            <div className="p-2 rounded-lg bg-primary/10">
+                                <FileText className="h-5 w-5 text-primary" />
                             </div>
-                            <h3 className="font-semibold">Authored</h3>
+                            <h3 className="font-semibold text-foreground">Authored</h3>
                         </div>
                         <p className="text-3xl font-bold">{profile?.stats?.authored_blogs_count ?? 0}</p>
                         <p className="text-sm text-muted-foreground">Blog posts written</p>

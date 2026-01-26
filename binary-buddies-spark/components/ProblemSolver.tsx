@@ -234,11 +234,11 @@ export const ProblemSolver = () => {
                 <button
                   key={stage.id}
                   onClick={() => handleStageClick(index)}
-                  className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 ${isActive
-                    ? 'bg-primary text-primary-foreground shadow-glow'
+                  className={`px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 border ${isActive
+                    ? 'bg-primary/10 text-primary border-primary/30 shadow-sm'
                     : isCompleted
-                      ? 'bg-primary/20 text-primary border border-primary/30'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                      ? 'bg-primary/5 text-primary/80 border-primary/10'
+                      : 'bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/50'
                     }`}
                 >
                   <span className="hidden sm:inline">{index + 1}. </span>
@@ -272,16 +272,17 @@ export const ProblemSolver = () => {
                   onClick={() => handleStageClick(index)}
                 >
                   {/* Stage Card */}
-                  <div className={`p-4 md:p-6 rounded-xl relative overflow-hidden text-center backdrop-blur-sm bg-card/60 transition-all duration-300 h-full ${isActive ? 'border-2 border-primary shadow-lg' :
-                    isCompleted ? 'border border-primary/50' : 'border border-muted'
+                  <div className={`p-4 md:p-6 rounded-xl relative overflow-hidden text-center backdrop-blur-sm bg-card/40 transition-all duration-500 h-full border ${isActive
+                    ? 'border-primary/50 shadow-[0_0_20px_rgba(62,207,142,0.05)] ring-1 ring-primary/20' :
+                    isCompleted ? 'border-primary/20' : 'border-border/50'
                     }`}>
                     {/* Active stage glow */}
                     {isActive && (
                       <motion.div
-                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20"
+                        className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/[0.03] to-transparent pointer-events-none"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.5 }}
                       />
                     )}
 

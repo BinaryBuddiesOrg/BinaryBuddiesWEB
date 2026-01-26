@@ -30,7 +30,7 @@ export const WarpBackground = ({
     >
       {/* Animated Grid Background */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(hsla(var(--primary)/0.1)_1px,transparent_1px),linear-gradient(90deg,hsla(var(--primary)/0.1)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
       </div>
 
       {/* Animated Beams */}
@@ -42,9 +42,8 @@ export const WarpBackground = ({
         return (
           <motion.div
             key={i}
-            className={`absolute bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 ${
-              isVertical ? "w-px h-full" : "h-px w-full"
-            }`}
+            className={`absolute bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 ${isVertical ? "w-px h-full" : "h-px w-full"
+              }`}
             style={{
               [isVertical ? "left" : "top"]: `${position}%`,
               [isVertical ? "top" : "left"]: 0,
