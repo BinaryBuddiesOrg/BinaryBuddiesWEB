@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Search, AlertCircle, ChevronLeft, ChevronRight, PenSquare } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { AlertCircle, ChevronLeft, ChevronRight, PenSquare } from "lucide-react";
 import { BlogCard } from "@/components/BlogCard";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
-import { Footer } from "@/components/Footer";
 import { categories } from "@/data/blogData";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
     Pagination,
@@ -24,8 +23,9 @@ import type { PaginatedBlogResponse } from "@/services/api";
 const POSTS_PER_PAGE = 12;
 
 export default function BlogPage() {
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get('search') || '';
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const canAuthorBlogs = useCanAuthorBlogs();
 
@@ -84,21 +84,16 @@ export default function BlogPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Reset page when category or search changes
+    // Reset page when category changes
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
-        setCurrentPage(1);
-    };
-
-    const handleSearchChange = (query: string) => {
-        setSearchQuery(query);
         setCurrentPage(1);
     };
 
     return (
         <div className="relative">
             {/* Hero Section */}
-            <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-16 md:pt-20">
+            <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden pt-20 md:pt-24">
                 {/* Animated Background */}
                 <div className="absolute inset-0 bg-gradient-hero opacity-50" />
 
@@ -157,37 +152,18 @@ export default function BlogPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8"
+                        className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto"
                     >
                         Expert insights on AI, automation, and the future of technology
                     </motion.p>
-
-                    {/* Search Bar */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
-                        className="max-w-2xl mx-auto"
-                    >
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                            <Input
-                                type="text"
-                                placeholder="Search articles..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                                className="pl-12 h-14 text-lg glass border-primary/20 focus:border-primary"
-                            />
-                        </div>
-                    </motion.div>
 
                     {/* Create Blog Button (for authorized users) */}
                     {canAuthorBlogs && (
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.8 }}
-                            className="mt-6"
+                            transition={{ duration: 0.8, delay: 0.6 }}
+                            className="mt-8"
                         >
                             <Link href="/blog/create">
                                 <Button className="gap-2">
@@ -394,8 +370,6 @@ export default function BlogPage() {
                     </div>
                 </section>
             )}
-
-            <Footer />
         </div>
     );
 }

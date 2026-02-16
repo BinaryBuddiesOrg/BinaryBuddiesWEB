@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
-import { Footer } from "@/components/Footer";
 import { BlogShareButton } from "@/components/BlogShareButton";
 import { SchemaMarkup } from "@/components/SEO/SchemaMarkup";
 import { RelatedArticles } from "@/components/SEO/RelatedArticles";
@@ -354,8 +353,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     </article>
                 </div>
             </section>
-
-            <Footer />
         </div>
     );
 }

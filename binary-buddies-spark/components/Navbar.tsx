@@ -22,7 +22,6 @@ const navItems = [
   { name: "Home", path: "/" },
   { name: "Products", path: "/products" },
   { name: "Portfolio", path: "/portfolio" },
-  { name: "Blog", path: "/blog" },
   { name: "Careers", path: "/careers" },
   { name: "Contact", path: "/contact" },
 ];
@@ -56,6 +55,11 @@ export const Navbar = () => {
     }
     return pathname.startsWith(path);
   };
+
+  // Hide on blog routes - blog has its own BlogNavbar
+  if (pathname?.startsWith('/blog')) {
+    return null;
+  }
 
   return (
     <motion.nav
@@ -215,7 +219,7 @@ export const Navbar = () => {
                 size="sm"
                 className="bg-primary hover:bg-primary-glow text-primary-foreground font-semibold shadow-glow hover:shadow-glow-strong transition-all duration-300"
               >
-                <Link href="/contact">Get Started</Link>
+                <Link href="/blog">Read Blogs</Link>
               </Button>
             </div>
           )}
@@ -246,52 +250,52 @@ export const Navbar = () => {
                     </span>
                   </div>
 
-                    {/* Mobile Navigation Items */}
-                    <nav className="flex flex-col gap-2 flex-1">
-                      {navItems.map((item, index) => (
-                        <motion.div
-                          key={item.path}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
+                  {/* Mobile Navigation Items */}
+                  <nav className="flex flex-col gap-2 flex-1">
+                    {navItems.map((item, index) => (
+                      <motion.div
+                        key={item.path}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Link
+                          href={item.path}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={cn(
+                            "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300",
+                            isActive(item.path)
+                              ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
+                              : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                          )}
                         >
-                          <Link
-                            href={item.path}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={cn(
-                              "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300",
-                              isActive(item.path)
-                                ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
-                                : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                            )}
-                          >
-                            {item.name}
-                          </Link>
-                        </motion.div>
-                      ))}
+                          {item.name}
+                        </Link>
+                      </motion.div>
+                    ))}
 
-                      {/* Create Blog - Mobile */}
-                      {canAuthorBlogs && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: navItems.length * 0.1 }}
+                    {/* Create Blog - Mobile */}
+                    {canAuthorBlogs && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: navItems.length * 0.1 }}
+                      >
+                        <Link
+                          href="/blog/create"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={cn(
+                            "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 gap-2 flex items-center",
+                            isActive("/blog/create")
+                              ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
+                              : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                          )}
                         >
-                          <Link
-                            href="/blog/create"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={cn(
-                              "block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 gap-2 flex items-center",
-                              isActive("/blog/create")
-                                ? "text-primary bg-primary/10 border border-primary/30 shadow-glow"
-                                : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                            )}
-                          >
-                            <PenSquare className="w-4 h-4" />
-                            <span>Create Blog</span>
-                          </Link>
-                        </motion.div>
-                      )}
+                          <PenSquare className="w-4 h-4" />
+                          <span>Create Blog</span>
+                        </Link>
+                      </motion.div>
+                    )}
 
                     {/* Services Section in Mobile */}
                     <motion.div
@@ -360,7 +364,7 @@ export const Navbar = () => {
                       className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-semibold shadow-glow hover:shadow-glow-strong"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <Link href="/contact">Get Started</Link>
+                      <Link href="/blog">Read Blogs</Link>
                     </Button>
                   </div>
                 </div>
