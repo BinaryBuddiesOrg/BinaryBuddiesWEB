@@ -91,100 +91,49 @@ export default function BlogPage() {
     };
 
     return (
-        <div className="relative">
-            {/* Hero Section */}
-            <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden pt-20 md:pt-24">
-                {/* Animated Background */}
-                <div className="absolute inset-0 bg-gradient-hero opacity-50" />
+        <div className="relative pt-16 md:pt-20">
+            {/* Category Filter Bar - Right below header */}
+            <div className="sticky top-16 md:top-20 z-40 py-4">
+                <div className="container mx-auto px-4">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                        {/* Category Tabs */}
+                        <div className="flex flex-wrap gap-2">
+                            {categories.map((category) => (
+                                <Button
+                                    key={category}
+                                    variant={selectedCategory === category ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleCategoryChange(category)}
+                                    className={
+                                        selectedCategory === category
+                                            ? "bg-primary text-white hover:bg-primary/90"
+                                            : "hover:bg-primary/10"
+                                    }
+                                >
+                                    {category}
+                                </Button>
+                            ))}
+                        </div>
 
-                {/* Floating Orbs */}
-                <motion.div
-                    className="absolute top-20 left-20 w-72 h-72 rounded-full bg-primary/20 blur-3xl"
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
-                <motion.div
-                    className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-accent/20 blur-3xl"
-                    animate={{
-                        scale: [1, 1.3, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                    }}
-                    transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
-
-                {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
-
-                {/* Content */}
-                <div className="relative z-10 container mx-auto px-4 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="flex items-center justify-center gap-2 mb-6"
-                    >
-                        <span className="text-muted-foreground font-semibold tracking-wider uppercase text-sm">
-                            Insights & Innovation
-                        </span>
-                    </motion.div>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
-                    >
-                        <span className="text-gradient glow-text">Tech Blog</span>
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto"
-                    >
-                        Expert insights on AI, automation, and the future of technology
-                    </motion.p>
-
-                    {/* Create Blog Button (for authorized users) */}
-                    {canAuthorBlogs && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.6 }}
-                            className="mt-8"
-                        >
+                        {/* Write Button for Authors */}
+                        {canAuthorBlogs && (
                             <Link href="/blog/create">
-                                <Button className="gap-2">
+                                <Button size="sm" className="gap-2">
                                     <PenSquare className="h-4 w-4" />
-                                    Create Blog Post
+                                    <span className="hidden sm:inline">Write Article</span>
+                                    <span className="sm:hidden">Write</span>
                                 </Button>
                             </Link>
-                        </motion.div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </section>
+            </div>
 
             {/* Loading State - Show Skeletons */}
             {isLoading && (
-                <section className="container mx-auto px-4 py-16">
+                <section className="container mx-auto px-4 py-8">
                     <div className="max-w-7xl mx-auto">
-                        <div className="text-center mb-12">
-                            <div className="h-8 w-48 bg-muted/50 rounded-md animate-pulse mx-auto mb-4" />
-                            <div className="h-4 w-32 bg-muted/30 rounded-md animate-pulse mx-auto" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[...Array(POSTS_PER_PAGE)].map((_, i) => (
                                 <BlogCardSkeleton key={i} />
                             ))}
@@ -205,37 +154,15 @@ export default function BlogPage() {
 
             {/* Content - Show when not loading and no error */}
             {!isLoading && !error && (
-                <section className="py-16 md:py-24">
+                <section className="py-8 md:py-12">
                     <div className="container mx-auto px-4">
-                        {/* Category Filter */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                            className="flex flex-wrap gap-3 justify-center mb-12"
-                        >
-                            {categories.map((category) => (
-                                <Button
-                                    key={category}
-                                    variant={selectedCategory === category ? "default" : "outline"}
-                                    onClick={() => handleCategoryChange(category)}
-                                    className={
-                                        selectedCategory === category
-                                            ? "bg-primary text-white hover:bg-primary/90 border-primary/50 shadow-sm"
-                                            : "glass"
-                                    }
-                                >
-                                    {category}
-                                </Button>
-                            ))}
-                        </motion.div>
-
+                        {/* Article count */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="text-center mb-8"
+                            className="text-center mb-6"
                         >
-                            <p className="text-muted-foreground">
+                            <p className="text-sm text-muted-foreground">
                                 {searchQuery
                                     ? `${filteredPosts.length} ${filteredPosts.length === 1 ? "article" : "articles"} found`
                                     : pagination
