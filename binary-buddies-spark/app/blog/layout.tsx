@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BlogNavbar } from "@/components/BlogNavbar";
 import { BlogFooter } from "@/components/BlogFooter";
 
@@ -8,8 +9,10 @@ export default function BlogLayout({
 }) {
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Blog-specific Navbar */}
-            <BlogNavbar />
+            {/* BlogNavbar uses useSearchParams — must be wrapped in Suspense */}
+            <Suspense fallback={null}>
+                <BlogNavbar />
+            </Suspense>
 
             {/* Main Content */}
             <main className="flex-1">

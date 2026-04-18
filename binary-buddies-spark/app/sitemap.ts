@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next';
 import { fetchBlogs } from '@/services/api';
 import type { ApiBlogPost } from '@/types/api';
 
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://binarybuddies.in';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
