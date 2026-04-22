@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- List View -->
+    <record id="view_app_ads_txt_tree" model="ir.ui.view">
+        <field name="name">bbweb.app.ads.txt.tree</field>
+        <field name="model">bbweb.app.ads.txt</field>
+        <field name="arch" type="xml">
+            <list string="App-ads.txt Entries" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="name"/>
+                <field name="domain"/>
+                <field name="publisher_id"/>
+                <field name="relationship"/>
+                <field name="certification_authority_id"/>
+                <field name="line" string="Generated Line"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_app_ads_txt_form" model="ir.ui.view">
+        <field name="name">bbweb.app.ads.txt.form</field>
+        <field name="model">bbweb.app.ads.txt</field>
+        <field name="arch" type="xml">
+            <form string="App-ads.txt Entry">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="name" placeholder="e.g., Google AdMob"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Ad Platform Details">
+                            <group>
+                                <group string="Required Fields">
+                                    <field name="domain" placeholder="e.g., google.com"/>
+                                    <field name="publisher_id" placeholder="e.g., pub-0000000000000000"/>
+                                    <field name="relationship"/>
+                                </group>
+                                <group string="Optional Fields">
+                                    <field name="certification_authority_id" placeholder="e.g., f08c47fec0942fa0"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <field name="line" readonly="1" string="Generated Line"/>
+                                <div class="alert alert-info" role="alert">
+                                    <p><strong>Format:</strong> domain, publisher_id, relationship[, certification_authority_id]</p>
+                                    <p><strong>Example:</strong> google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0</p>
+                                </div>
+                            </group>
+                        </page>
+                        
+                        <page string="Notes">
+                            <field name="notes" placeholder="Internal notes about this ad platform entry..."/>
+                        </page>
+                        
+                        <page string="Help">
+                            <group>
+                                <div class="alert alert-info" role="alert">
+                                    <h4>About app-ads.txt</h4>
+                                    <p>The app-ads.txt file identifies authorized sellers of your app's ad inventory, protecting against ad fraud and counterfeit inventory.</p>
+                                    
+                                    <h5>Field Descriptions:</h5>
+                                    <ul>
+                                        <li><strong>Domain:</strong> The ad system domain (e.g., google.com for AdMob)</li>
+                                        <li><strong>Publisher ID:</strong> Your unique publisher account ID from the ad platform</li>
+                                        <li><strong>Relationship:</strong> DIRECT (you own the account) or RESELLER (you use a reseller)</li>
+                                        <li><strong>Certification Authority ID:</strong> Optional TAG-ID for verification (e.g., f08c47fec0942fa0 for Google)</li>
+                                    </ul>
+                                    
+                                    <h5>For Google AdMob:</h5>
+                                    <p>Find your Publisher ID in AdMob console → Settings → Account → Publisher ID</p>
+                                    <p>Google's Certification Authority ID: f08c47fec0942fa0</p>
+                                    
+                                    <h5>File Location:</h5>
+                                    <p>The file will be accessible at: <strong>https://binarybuddies.in/app-ads.txt</strong></p>
+                                </div>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_app_ads_txt" model="ir.actions.act_window">
+        <field name="name">App-ads.txt</field>
+        <field name="res_model">bbweb.app.ads.txt</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first app-ads.txt entry
+            </p>
+            <p>
+                The app-ads.txt file helps ad platforms verify authorized sellers of your app's ad inventory.
+                Add entries for each ad platform you use (e.g., Google AdMob, Facebook Audience Network).
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Blog Post 1 -->
+    <record id="blog_ai_automation" model="bbweb.blog.post">
+        <field name="title">The Future of AI-Powered Automation in Enterprise Software</field>
+        <field name="excerpt">Discover how artificial intelligence is revolutionizing business process automation and transforming enterprise workflows for maximum efficiency.</field>
+        <field name="content"><![CDATA[
+            <p>As we move deeper into 2024, AI-powered automation is no longer a luxury—it's a necessity for businesses looking to stay competitive. This comprehensive guide explores the latest trends and best practices in enterprise automation.</p>
+            <h2>Key Benefits</h2>
+            <ul>
+                <li>Increased efficiency and productivity</li>
+                <li>Reduced operational costs</li>
+                <li>Improved accuracy and consistency</li>
+                <li>Enhanced decision-making capabilities</li>
+            </ul>
+        ]]></field>
+        <field name="category">ai_ml</field>
+        <field name="author_name">Sarah Chen</field>
+        <field name="author_avatar">SC</field>
+        <field name="publish_date">2024-12-05</field>
+        <field name="read_time">8 min read</field>
+        <field name="featured" eval="True"/>
+    </record>
+
+    <!-- Blog Post 2 -->
+    <record id="blog_hyperautomation" model="bbweb.blog.post">
+        <field name="title">Hyperautomation: The Next Evolution in Digital Transformation</field>
+        <field name="excerpt">Learn how hyperautomation combines RPA, AI, and machine learning to create end-to-end intelligent automation solutions.</field>
+        <field name="content"><![CDATA[
+            <p>Hyperautomation represents a paradigm shift in how organizations approach digital transformation. By combining multiple technologies, businesses can achieve unprecedented levels of automation.</p>
+        ]]></field>
+        <field name="category">automation</field>
+        <field name="author_name">Michael Rodriguez</field>
+        <field name="author_avatar">MR</field>
+        <field name="publish_date">2024-12-03</field>
+        <field name="read_time">6 min read</field>
+        <field name="featured" eval="True"/>
+    </record>
+
+    <!-- Blog Post 3 -->
+    <record id="blog_microservices" model="bbweb.blog.post">
+        <field name="title">Building Scalable Microservices with Modern Architecture Patterns</field>
+        <field name="excerpt">A comprehensive guide to designing and implementing microservices architecture for high-performance applications.</field>
+        <field name="content"><![CDATA[
+            <p>Microservices architecture has become the de facto standard for building scalable, maintainable applications. This guide covers everything you need to know.</p>
+        ]]></field>
+        <field name="category">development</field>
+        <field name="author_name">Alex Kumar</field>
+        <field name="author_avatar">AK</field>
+        <field name="publish_date">2024-12-01</field>
+        <field name="read_time">10 min read</field>
+        <field name="featured" eval="False"/>
+    </record>
+
+    <!-- Blog Post 4 -->
+    <record id="blog_ml_deployment" model="bbweb.blog.post">
+        <field name="title">Machine Learning Model Deployment: Best Practices for Production</field>
+        <field name="excerpt">Essential strategies for deploying ML models at scale, from containerization to monitoring and continuous improvement.</field>
+        <field name="content"><![CDATA[
+            <p>Deploying machine learning models to production environments requires careful planning and robust infrastructure. Learn the best practices from industry experts.</p>
+        ]]></field>
+        <field name="category">ai_ml</field>
+        <field name="author_name">Dr. Emily Watson</field>
+        <field name="author_avatar">EW</field>
+        <field name="publish_date">2024-11-28</field>
+        <field name="read_time">12 min read</field>
+        <field name="featured" eval="False"/>
+    </record>
+
+    <!-- Blog Post 5 -->
+    <record id="blog_nocode" model="bbweb.blog.post">
+        <field name="title">The Rise of No-Code/Low-Code Platforms in 2024</field>
+        <field name="excerpt">How no-code and low-code platforms are democratizing software development and empowering citizen developers.</field>
+        <field name="content"><![CDATA[
+            <p>The no-code/low-code revolution is transforming who can build software and how quickly applications can be developed.</p>
+        ]]></field>
+        <field name="category">industry_news</field>
+        <field name="author_name">James Park</field>
+        <field name="author_avatar">JP</field>
+        <field name="publish_date">2024-11-25</field>
+        <field name="read_time">7 min read</field>
+        <field name="featured" eval="False"/>
+    </record>
+
+    <!-- Blog Post 6 -->
+    <record id="blog_api_first" model="bbweb.blog.post">
+        <field name="title">API-First Development: Why It Matters for Modern Applications</field>
+        <field name="excerpt">Understanding the API-first approach and how it accelerates development, improves collaboration, and future-proofs your applications.</field>
+        <field name="content"><![CDATA[
+            <p>In today's interconnected digital ecosystem, APIs are the backbone of modern software architecture.</p>
+        ]]></field>
+        <field name="category">development</field>
+        <field name="author_name">Rachel Thompson</field>
+        <field name="author_avatar">RT</field>
+        <field name="publish_date">2024-11-22</field>
+        <field name="read_time">9 min read</field>
+        <field name="featured" eval="False"/>
+    </record>
+
+    <!-- Blog Post 7 -->
+    <record id="blog_edge_ai" model="bbweb.blog.post">
+        <field name="title">Edge AI: Bringing Intelligence Closer to Data Sources</field>
+        <field name="excerpt">Explore how edge computing and AI are converging to enable real-time processing and reduce latency in critical applications.</field>
+        <field name="content"><![CDATA[
+            <p>Edge AI represents a fundamental shift in how we deploy and utilize artificial intelligence.</p>
+        ]]></field>
+        <field name="category">ai_ml</field>
+        <field name="author_name">David Lin</field>
+        <field name="author_avatar">DL</field>
+        <field name="publish_date">2024-11-20</field>
+        <field name="read_time">8 min read</field>
+        <field name="featured" eval="True"/>
+    </record>
+
+    <!-- Blog Post 8 -->
+    <record id="blog_rpa_roi" model="bbweb.blog.post">
+        <field name="title">Robotic Process Automation: ROI and Implementation Strategies</field>
+        <field name="excerpt">A practical guide to implementing RPA in your organization, measuring success, and maximizing return on investment.</field>
+        <field name="content"><![CDATA[
+            <p>Robotic Process Automation (RPA) has proven to deliver significant ROI across industries.</p>
+        ]]></field>
+        <field name="category">automation</field>
+        <field name="author_name">Maria Garcia</field>
+        <field name="author_avatar">MG</field>
+        <field name="publish_date">2024-11-18</field>
+        <field name="read_time">11 min read</field>
+        <field name="featured" eval="False"/>
+    </record>
+</odoo>
