@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from odoo.tools.mail import html2plaintext
 from datetime import datetime, timezone
+import random
 import re
 import unicodedata
 
@@ -273,14 +274,17 @@ class BlogPost(models.Model):
         page=1,
         limit=20,
         include_body=False,
+        random_sample=False,
         max_snippet_len=320,
         max_body_len=12000,
+        random_pool_max=500,
     ):
         """
         Serp-style JSON for integrations / LLMs: metadata + organic_results (plain snippets).
 
         :param q: Search substring for title, excerpt, HTML body (ilike).
         :param since/until: publish_date bounds (YYYY-MM-DD strings).
+        :param random_sample: If True, shuffle posts matching the domain (cap random_pool_max for performance).
         """
         Blog = self.sudo()
         domain = [('active', '=', True)]
@@ -349,15 +353,23 @@ class BlogPost(models.Model):
 
         total = Blog.search_count(domain)
         offset = (page - 1) * limit
-        posts = Blog.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
 
-        if q_strip:
-            posts = posts.sorted(key=lambda p: Blog._serp_relevance_key(p, q_lower))
-        offset = (page - 1) * limit
-        posts = Blog.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
+        try:
+            pool_cap = max(1, min(int(random_pool_max), 2000))
+        except (TypeError, ValueError):
+            pool_cap = 500
 
-        if q_strip:
-            posts = posts.sorted(key=lambda p: Blog._serp_relevance_key(p, q_lower))
+        if random_sample:
+            pool_size = min(total, pool_cap)
+            candidates = Blog.search(domain, order='publish_date desc, id desc', limit=pool_size)
+            ids_shuffled = list(candidates.ids)
+            random.shuffle(ids_shuffled)
+            page_ids = ids_shuffled[offset : offset + limit]
+            posts = Blog.browse(page_ids)
+        else:
+            posts = Blog.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
+            if q_strip:
+                posts = posts.sorted(key=lambda p: Blog._serp_relevance_key(p, q_lower))
 
         processed_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
         organic = []
@@ -386,18 +398,29 @@ class BlogPost(models.Model):
                 row['content_text'] = body[:max_body_len] + ('…' if len(body) > max_body_len else '')
             organic.append(row)
 
+        effective_total = min(total, pool_cap) if random_sample else total
+        has_more = offset + len(organic) < effective_total
+
+        meta = {
+            'status': 'Success',
+            'engine': 'bbweb_blog',
+            'q': q_strip,
+            'total_results': total,
+            'page': page,
+            'limit': limit,
+            'has_more': has_more,
+            'processed_at': processed_at,
+            'include_body': include_body,
+            'random': bool(random_sample),
+        }
+        if random_sample:
+            pool_size = min(total, pool_cap)
+            meta['random_pool_size'] = pool_size
+            meta['random_pool_capped'] = total > pool_cap
+            meta['random_pool_max'] = pool_cap
+
         return {
-            'search_metadata': {
-                'status': 'Success',
-                'engine': 'bbweb_blog',
-                'q': q_strip,
-                'total_results': total,
-                'page': page,
-                'limit': limit,
-                'has_more': offset + len(posts) < total,
-                'processed_at': processed_at,
-                'include_body': include_body,
-            },
+            'search_metadata': meta,
             'organic_results': organic,
         }
     

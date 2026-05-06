@@ -502,6 +502,7 @@ The API logs the following:
 | `since` / `until` | Filter `publish_date` (`YYYY-MM-DD`). Invalid dates → `400`. |
 | `featured` | `1` / `true` to restrict to featured posts. |
 | `page` | Page number (default `1`, minimum `1`). |
+| `random` | `1` / `true` to **shuffle** matching posts (then paginate). Ignores relevance sort when `q` is set. Pool capped at **500** IDs (`random_pool_max` server-side); see `random_pool_capped` in metadata when total exceeds cap. |
 | `limit` | Page size (default `20`, max `50`). |
 | `include_body` | `1` / `true` to add `content_text` (HTML → plain text, capped at 12000 characters). |
 
@@ -516,6 +517,7 @@ Each hit includes **`link`**: `{public_origin}/blog/{slug}`.
 
 ```bash
 curl -s "http://localhost:8069/api/bbweb/blogs/search?q=automation&limit=5"
+curl -s "http://localhost:8069/api/bbweb/blogs/search?random=1&limit=5"
 ```
 
 Minimal response shape:
@@ -531,7 +533,8 @@ Minimal response shape:
     "limit": 5,
     "has_more": false,
     "processed_at": "2026-05-06T12:00:00Z",
-    "include_body": false
+    "include_body": false,
+    "random": false
   },
   "organic_results": [
     {

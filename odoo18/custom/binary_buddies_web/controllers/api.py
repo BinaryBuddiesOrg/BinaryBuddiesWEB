@@ -203,6 +203,7 @@ class BinaryBuddiesWebAPI(http.Controller):
         page=1,
         limit=20,
         include_body=None,
+        random=None,
         **kwargs,
     ):
         """Serp-style JSON for LLMs and integrations (metadata + organic_results, plain snippets)."""
@@ -232,6 +233,7 @@ class BinaryBuddiesWebAPI(http.Controller):
                 page=page,
                 limit=limit,
                 include_body=self._query_bool(include_body),
+                random_sample=self._query_bool(random),
             )
             return self._json_response(payload)
         except ValidationError as ve:
