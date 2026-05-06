@@ -14,7 +14,7 @@
                 <li>Enhanced decision-making capabilities</li>
             </ul>
         ]]></field>
-        <field name="category">ai_ml</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_ai_ml"/>
         <field name="author_name">Sarah Chen</field>
         <field name="author_avatar">SC</field>
         <field name="publish_date">2024-12-05</field>
@@ -29,7 +29,7 @@
         <field name="content"><![CDATA[
             <p>Hyperautomation represents a paradigm shift in how organizations approach digital transformation. By combining multiple technologies, businesses can achieve unprecedented levels of automation.</p>
         ]]></field>
-        <field name="category">automation</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_automation"/>
         <field name="author_name">Michael Rodriguez</field>
         <field name="author_avatar">MR</field>
         <field name="publish_date">2024-12-03</field>
@@ -44,7 +44,7 @@
         <field name="content"><![CDATA[
             <p>Microservices architecture has become the de facto standard for building scalable, maintainable applications. This guide covers everything you need to know.</p>
         ]]></field>
-        <field name="category">development</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_development"/>
         <field name="author_name">Alex Kumar</field>
         <field name="author_avatar">AK</field>
         <field name="publish_date">2024-12-01</field>
@@ -59,7 +59,7 @@
         <field name="content"><![CDATA[
             <p>Deploying machine learning models to production environments requires careful planning and robust infrastructure. Learn the best practices from industry experts.</p>
         ]]></field>
-        <field name="category">ai_ml</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_ai_ml"/>
         <field name="author_name">Dr. Emily Watson</field>
         <field name="author_avatar">EW</field>
         <field name="publish_date">2024-11-28</field>
@@ -74,7 +74,7 @@
         <field name="content"><![CDATA[
             <p>The no-code/low-code revolution is transforming who can build software and how quickly applications can be developed.</p>
         ]]></field>
-        <field name="category">industry_news</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_industry_news"/>
         <field name="author_name">James Park</field>
         <field name="author_avatar">JP</field>
         <field name="publish_date">2024-11-25</field>
@@ -89,7 +89,7 @@
         <field name="content"><![CDATA[
             <p>In today's interconnected digital ecosystem, APIs are the backbone of modern software architecture.</p>
         ]]></field>
-        <field name="category">development</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_development"/>
         <field name="author_name">Rachel Thompson</field>
         <field name="author_avatar">RT</field>
         <field name="publish_date">2024-11-22</field>
@@ -104,7 +104,7 @@
         <field name="content"><![CDATA[
             <p>Edge AI represents a fundamental shift in how we deploy and utilize artificial intelligence.</p>
         ]]></field>
-        <field name="category">ai_ml</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_ai_ml"/>
         <field name="author_name">David Lin</field>
         <field name="author_avatar">DL</field>
         <field name="publish_date">2024-11-20</field>
@@ -119,7 +119,7 @@
         <field name="content"><![CDATA[
             <p>Robotic Process Automation (RPA) has proven to deliver significant ROI across industries.</p>
         ]]></field>
-        <field name="category">automation</field>
+        <field name="category_id" ref="binary_buddies_web.blog_category_automation"/>
         <field name="author_name">Maria Garcia</field>
         <field name="author_avatar">MG</field>
         <field name="publish_date">2024-11-18</field>

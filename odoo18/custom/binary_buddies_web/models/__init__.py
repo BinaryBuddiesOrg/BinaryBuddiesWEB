@@ -6,6 +6,7 @@ from . import project_tag
 from . import team_member
 from . import certification
 from . import blog_tag
+from . import blog_category
 from . import blog_post
 from . import career
 from . import job_requirement

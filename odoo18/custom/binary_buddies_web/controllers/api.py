@@ -106,30 +106,46 @@ class BinaryBuddiesWebAPI(http.Controller):
             return self._error_response(str(e), status=500)
 
     # Blog Posts Endpoints
+    @http.route('/api/bbweb/blogs/categories', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def get_blog_categories(self, **kwargs):
+        """List active blog categories (dynamic)."""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+            data = request.env['bbweb.blog.category'].sudo().get_api_list()
+            return self._json_response(data)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
     @http.route('/api/bbweb/blogs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
     def get_blogs(self, category=None, page=1, limit=None, **kwargs):
         """Get all active blog posts, optionally filtered by category, with pagination"""
         try:
             if request.httprequest.method == 'OPTIONS':
                 return self._json_response({})
-            
-            # Map frontend category names to database values
-            category_map = {
-                'AI/ML': 'ai_ml',
-                'Automation': 'automation',
-                'Development': 'development',
-                'Industry News': 'industry_news',
-            }
-            
-            category_filter = category_map.get(category) if category else None
-            
-            # Parse pagination parameters
+
             try:
                 page = int(page) if page else 1
                 limit = int(limit) if limit else None
             except (ValueError, TypeError):
                 page = 1
                 limit = None
+
+            category_filter = None
+            if category:
+                cat = request.env['bbweb.blog.category'].sudo().resolve_from_api_filter(category)
+                if not cat:
+                    empty = {
+                        'data': [],
+                        'pagination': {
+                            'total': 0,
+                            'page': page,
+                            'limit': limit if limit is not None else 0,
+                            'has_more': False,
+                        },
+                    }
+                    return self._json_response(empty)
+                category_filter = cat
             
             result = request.env['bbweb.blog.post'].sudo().get_api_data(
                 category_filter=category_filter,
@@ -175,13 +191,6 @@ class BinaryBuddiesWebAPI(http.Controller):
             if not blog.exists() or not blog.active:
                 return self._error_response('Blog post not found', status=404)
             
-            category_map = {
-                'ai_ml': 'AI/ML',
-                'automation': 'Automation',
-                'development': 'Development',
-                'industry_news': 'Industry News',
-            }
-            
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
@@ -197,7 +206,8 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'slug': blog.slug,
                 'excerpt': blog.excerpt,
                 'content': processed_content,
-                'category': category_map.get(blog.category, blog.category),
+                'category': blog.category_id.name if blog.category_id else '',
+                'category_code': blog.category_id.code if blog.category_id else '',
                 'author': {
                     'name': blog.author_name,
                     'avatar': blog.author_avatar or blog.author_name[:2].upper(),
@@ -232,13 +242,6 @@ class BinaryBuddiesWebAPI(http.Controller):
             if not blog:
                 return self._error_response('Blog post not found', status=404)
             
-            category_map = {
-                'ai_ml': 'AI/ML',
-                'automation': 'Automation',
-                'development': 'Development',
-                'industry_news': 'Industry News',
-            }
-            
             # Process content to fix relative URLs for images
             processed_content = blog._process_html_content(blog.content)
             
@@ -254,7 +257,8 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'slug': blog.slug,
                 'excerpt': blog.excerpt,
                 'content': processed_content,
-                'category': category_map.get(blog.category, blog.category),
+                'category': blog.category_id.name if blog.category_id else '',
+                'category_code': blog.category_id.code if blog.category_id else '',
                 'author': {
                     'name': blog.author_name,
                     'avatar': blog.author_avatar or blog.author_name[:2].upper(),
@@ -668,14 +672,13 @@ class BinaryBuddiesWebAPI(http.Controller):
                     'message': f'Missing required fields: {", ".join(missing_fields)}',
                     'required_fields': required_fields
                 }
-            
-            # Validate category
-            valid_categories = ['ai_ml', 'automation', 'development', 'industry_news']
-            if kwargs.get('category') not in valid_categories:
+
+            BlogCategory = request.env['bbweb.blog.category'].sudo()
+            category_rec = BlogCategory.get_or_create_from_api_value(kwargs.get('category'))
+            if not category_rec:
                 return {
                     'status': 'error',
-                    'message': f'Invalid category. Must be one of: {", ".join(valid_categories)}',
-                    'valid_categories': valid_categories
+                    'message': 'Invalid category. Provide a non-empty category name or code.',
                 }
             
             # ============================================================
@@ -685,7 +688,7 @@ class BinaryBuddiesWebAPI(http.Controller):
                 'title': kwargs['title'],
                 'excerpt': kwargs['excerpt'],
                 'content': kwargs['content'],
-                'category': kwargs['category'],
+                'category_id': category_rec.id,
                 'author_name': kwargs['author_name'],
                 'author_avatar': kwargs.get('author_avatar', kwargs['author_name'][:2].upper()),
                 'publish_date': kwargs.get('publish_date', fields.Date.today()),
@@ -806,7 +809,8 @@ class BinaryBuddiesWebAPI(http.Controller):
                     'title': blog.title,
                     'url': f'/blog/{blog.slug}',
                     'author': blog.author_name,
-                    'category': blog.category,
+                    'category': blog.category_id.code if blog.category_id else '',
+                    'category_name': blog.category_id.name if blog.category_id else '',
                     'publish_date': blog.publish_date.strftime('%Y-%m-%d') if blog.publish_date else None,
                     'featured': blog.featured,
                     'active': blog.active,
@@ -1261,14 +1265,6 @@ class BinaryBuddiesWebAPI(http.Controller):
             likes = BlogLike.search(domain, order='create_date desc', limit=limit, offset=offset)
             
             # Get blog data
-            Blog = request.env['bbweb.blog.post'].sudo()
-            category_map = {
-                'ai_ml': 'AI/ML',
-                'automation': 'Automation',
-                'development': 'Development',
-                'industry_news': 'Industry News',
-            }
-            
             result = []
             for like in likes:
                 blog = like.blog_id
@@ -1281,7 +1277,8 @@ class BinaryBuddiesWebAPI(http.Controller):
                         'title': blog.title,
                         'slug': blog.slug,
                         'excerpt': blog.excerpt,
-                        'category': category_map.get(blog.category, blog.category),
+                        'category': blog.category_id.name if blog.category_id else '',
+                        'category_code': blog.category_id.code if blog.category_id else '',
                         'author': {
                             'name': blog.author_name,
                             'avatar': blog.author_avatar or blog.author_name[:2].upper(),

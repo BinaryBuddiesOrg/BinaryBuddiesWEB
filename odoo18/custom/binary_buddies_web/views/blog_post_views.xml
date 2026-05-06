@@ -10,7 +10,7 @@
                 <field name="publish_date"/>
                 <field name="title"/>
                 <field name="slug"/>
-                <field name="category"/>
+                <field name="category_id"/>
                 <field name="author_name"/>
                 <field name="featured" widget="boolean_toggle"/>
                 <field name="active" widget="boolean_toggle"/>
@@ -44,7 +44,7 @@
                         <group>
                             <field name="title" placeholder="Blog post title..."/>
                             <field name="slug" placeholder="URL-friendly slug (auto-generated from title)"/>
-                            <field name="category"/>
+                            <field name="category_id" required="1"/>
                             <field name="publish_date"/>
                             <field name="read_time" placeholder="e.g., 8 min read"/>
                         </group>
@@ -138,17 +138,14 @@
         <field name="arch" type="xml">
             <search string="Search Blog Posts">
                 <field name="title"/>
+                <field name="category_id"/>
                 <field name="author_name"/>
                 <filter string="Active" name="active" domain="[('active', '=', True)]"/>
                 <filter string="Featured" name="featured" domain="[('featured', '=', True)]"/>
                 <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 <separator/>
-                <filter string="AI/ML" name="category_ai_ml" domain="[('category', '=', 'ai_ml')]"/>
-                <filter string="Automation" name="category_automation" domain="[('category', '=', 'automation')]"/>
-                <filter string="Development" name="category_development" domain="[('category', '=', 'development')]"/>
-                <filter string="Industry News" name="category_industry_news" domain="[('category', '=', 'industry_news')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
                     <filter string="Author" name="group_author" context="{'group_by': 'author_name'}"/>
                     <filter string="Publish Date" name="group_publish_date" context="{'group_by': 'publish_date'}"/>
                 </group>
@@ -170,6 +167,47 @@
                 Share insights and knowledge with blog posts that will be displayed on the website.
             </p>
         </field>
+    </record>
+
+    <!-- Blog Category Views -->
+    <record id="view_bbweb_blog_category_tree" model="ir.ui.view">
+        <field name="name">bbweb.blog.category.tree</field>
+        <field name="model">bbweb.blog.category</field>
+        <field name="arch" type="xml">
+            <list string="Blog Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bbweb_blog_category_form" model="ir.ui.view">
+        <field name="name">bbweb.blog.category.form</field>
+        <field name="model">bbweb.blog.category</field>
+        <field name="arch" type="xml">
+            <form string="Blog Category">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bbweb_blog_category" model="ir.actions.act_window">
+        <field name="name">Blog Categories</field>
+        <field name="res_model">bbweb.blog.category</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Blog Tag Views -->

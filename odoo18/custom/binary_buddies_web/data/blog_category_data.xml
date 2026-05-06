@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    <record id="blog_category_ai_ml" model="bbweb.blog.category">
+        <field name="name">AI/ML</field>
+        <field name="code">ai_ml</field>
+        <field name="sequence" eval="10"/>
+    </record>
+    <record id="blog_category_automation" model="bbweb.blog.category">
+        <field name="name">Automation</field>
+        <field name="code">automation</field>
+        <field name="sequence" eval="20"/>
+    </record>
+    <record id="blog_category_development" model="bbweb.blog.category">
+        <field name="name">Development</field>
+        <field name="code">development</field>
+        <field name="sequence" eval="30"/>
+    </record>
+    <record id="blog_category_industry_news" model="bbweb.blog.category">
+        <field name="name">Industry News</field>
+        <field name="code">industry_news</field>
+        <field name="sequence" eval="40"/>
+    </record>
+    </data>
+</odoo>

@@ -79,6 +79,12 @@
               action="action_bbweb_project_tag"
               sequence="10"/>
 
+    <menuitem id="menu_bbweb_blog_categories"
+              name="Blog Categories"
+              parent="menu_bbweb_config"
+              action="action_bbweb_blog_category"
+              sequence="15"/>
+
     <menuitem id="menu_bbweb_blog_tags"
               name="Blog Tags"
               parent="menu_bbweb_config"

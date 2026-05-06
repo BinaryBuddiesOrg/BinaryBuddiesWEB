@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 import re
 import unicodedata
 
@@ -52,12 +53,14 @@ class BlogPost(models.Model):
         strip_classes=False,
     )
     
-    category = fields.Selection([
-        ('ai_ml', 'AI/ML'),
-        ('automation', 'Automation'),
-        ('development', 'Development'),
-        ('industry_news', 'Industry News'),
-    ], string='Category', required=True, default='development')
+    category_id = fields.Many2one(
+        'bbweb.blog.category',
+        string='Category',
+        required=False,
+        ondelete='restrict',
+        index=True,
+        help='Stored nullable so upgrades run before category XML is loaded; always set on create.',
+    )
     
     # Author information
     author_name = fields.Char(string='Author Name', required=True)
@@ -100,7 +103,22 @@ class BlogPost(models.Model):
     _sql_constraints = [
         ('slug_unique', 'UNIQUE(slug)', 'The slug must be unique!'),
     ]
-    
+
+    @api.model
+    def _resolve_default_category_id(self):
+        """Prefer XML id; fallback search (safe when ref missing during early registry init)."""
+        ref = self.env.ref('binary_buddies_web.blog_category_development', raise_if_not_found=False)
+        if ref:
+            return ref.id
+        cat = self.env['bbweb.blog.category'].search([('code', '=', 'development')], limit=1)
+        return cat.id if cat else False
+
+    @api.constrains('category_id')
+    def _check_category_id(self):
+        for post in self:
+            if not post.category_id:
+                raise ValidationError(_('Blog post must have a category.'))
+
     def increment_view_count(self):
         """Increment the view count for this blog post"""
         self.write({'view_count': self.view_count + 1})
@@ -151,6 +169,14 @@ class BlogPost(models.Model):
     @api.model
     def create(self, vals):
         """Auto-generate slug if not provided"""
+        vals = dict(vals)
+        if not vals.get('category_id'):
+            cid = self._resolve_default_category_id()
+            if not cid:
+                raise ValidationError(
+                    _('No blog category is configured. Create a category with code "development" or reload module data.')
+                )
+            vals['category_id'] = cid
         if 'slug' not in vals or not vals.get('slug'):
             if 'title' in vals and vals.get('title'):
                 base_slug = self._slugify(vals['title'])
@@ -246,7 +272,7 @@ class BlogPost(models.Model):
         domain = [('active', '=', True)]
         
         if category_filter:
-            domain.append(('category', '=', category_filter))
+            domain.append(('category_id', '=', category_filter.id))
         
         if featured_only:
             domain.append(('featured', '=', True))
@@ -263,14 +289,6 @@ class BlogPost(models.Model):
         
         result = []
         base_url = self._get_base_url()
-        
-        # Category mapping for API
-        category_map = {
-            'ai_ml': 'AI/ML',
-            'automation': 'Automation',
-            'development': 'Development',
-            'industry_news': 'Industry News',
-        }
         
         for post in posts:
             # Process content to fix relative URLs
@@ -289,7 +307,8 @@ class BlogPost(models.Model):
                 'slug': post.slug,
                 'excerpt': post.excerpt,
                 'content': processed_content,
-                'category': category_map.get(post.category, post.category),
+                'category': post.category_id.name if post.category_id else '',
+                'category_code': post.category_id.code if post.category_id else '',
                 'author': {
                     'name': post.author_name,
                     'avatar': post.author_avatar or post.author_name[:2].upper(),

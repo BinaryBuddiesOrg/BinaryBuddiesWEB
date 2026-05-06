@@ -23,6 +23,8 @@ access_bbweb_job_application_user,bbweb.job.application.user,model_bbweb_job_app
 access_bbweb_job_application_public,bbweb.job.application.public,model_bbweb_job_application,base.group_public,1,1,1,0
 access_bbweb_blog_tag_user,bbweb.blog.tag.user,model_bbweb_blog_tag,base.group_user,1,1,1,1
 access_bbweb_blog_tag_public,bbweb.blog.tag.public,model_bbweb_blog_tag,base.group_public,1,0,0,0
+access_bbweb_blog_category_user,bbweb.blog.category.user,model_bbweb_blog_category,base.group_user,1,1,1,1
+access_bbweb_blog_category_public,bbweb.blog.category.public,model_bbweb_blog_category,base.group_public,1,0,0,0
 access_bbweb_website_page_seo_user,bbweb.website.page.seo.user,model_bbweb_website_page_seo,base.group_user,1,1,1,1
 access_bbweb_website_page_seo_public,bbweb.website.page.seo.public,model_bbweb_website_page_seo,base.group_public,1,0,0,0
 access_bbweb_website_user_user,bbweb.website.user.user,model_bbweb_website_user,base.group_user,1,1,1,1

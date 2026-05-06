@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Binary Buddies Web',
-    'version': '1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Website',
     'summary': 'Manage Binary Buddies website content - Projects, Team, Blog, Careers',
     'description': """
@@ -17,6 +17,7 @@ Features:
 * Blog Posts with categories and featured posts
 * Career Listings with requirements and responsibilities
 * Public REST API endpoints for frontend integration
+* Dynamic blog categories (backend + GET /api/bbweb/blogs/categories)
 * Image management for all content types
 
 API Endpoints:
@@ -24,6 +25,7 @@ API Endpoints:
 * /api/bbweb/projects - Featured projects
 * /api/bbweb/team - Team members
 * /api/bbweb/blogs - Blog posts
+* /api/bbweb/blogs/categories - Blog categories (dynamic list)
 * /api/bbweb/careers - Career listings
 
 All endpoints are publicly accessible and return JSON data.
@@ -34,6 +36,7 @@ All endpoints are publicly accessible and return JSON data.
     'depends': ['base', 'web'],
     'data': [
         'security/ir.model.access.csv',
+        'data/blog_category_data.xml',
         'views/menu_root.xml',
         'views/featured_project_views.xml',
         'views/team_member_views.xml',
