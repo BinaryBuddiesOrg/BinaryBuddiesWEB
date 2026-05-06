@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import http, fields
+from odoo.exceptions import ValidationError
 from odoo.http import request
 from odoo.tools import config
 import json
@@ -8,6 +9,14 @@ import json
 
 class BinaryBuddiesWebAPI(http.Controller):
     """Public API endpoints for Binary Buddies website content"""
+
+    @staticmethod
+    def _query_bool(val):
+        if val is None:
+            return False
+        if isinstance(val, bool):
+            return val
+        return str(val).strip().lower() in ('1', 'true', 'yes', 'on')
 
     def _json_response(self, data, status=200):
         """Helper method to create JSON responses with CORS headers"""
@@ -177,6 +186,56 @@ class BinaryBuddiesWebAPI(http.Controller):
                 limit=limit
             )
             return self._json_response(result)
+        except Exception as e:
+            return self._error_response(str(e), status=500)
+
+    @http.route('/api/bbweb/blogs/search', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False, cors='*')
+    def search_blogs_serp(
+        self,
+        q=None,
+        category=None,
+        category_code=None,
+        tag=None,
+        slug=None,
+        since=None,
+        until=None,
+        featured=None,
+        page=1,
+        limit=20,
+        include_body=None,
+        **kwargs,
+    ):
+        """Serp-style JSON for LLMs and integrations (metadata + organic_results, plain snippets)."""
+        try:
+            if request.httprequest.method == 'OPTIONS':
+                return self._json_response({})
+
+            try:
+                page = max(1, int(page))
+            except (TypeError, ValueError):
+                page = 1
+            try:
+                limit = int(limit)
+            except (TypeError, ValueError):
+                limit = 20
+            limit = max(1, min(limit, 50))
+
+            payload = request.env['bbweb.blog.post'].sudo().get_serp_search(
+                q=q,
+                category=category,
+                category_code=category_code,
+                tag=tag,
+                slug=slug,
+                since=since,
+                until=until,
+                featured_only=self._query_bool(featured),
+                page=page,
+                limit=limit,
+                include_body=self._query_bool(include_body),
+            )
+            return self._json_response(payload)
+        except ValidationError as ve:
+            return self._error_response(str(ve), status=400)
         except Exception as e:
             return self._error_response(str(e), status=500)
 

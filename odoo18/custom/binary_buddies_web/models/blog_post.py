@@ -2,6 +2,8 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.mail import html2plaintext
+from datetime import datetime, timezone
 import re
 import unicodedata
 
@@ -208,6 +210,196 @@ class BlogPost(models.Model):
         """Get the base URL for the Odoo instance"""
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         return base_url or 'http://localhost:8069'
+
+    @api.model
+    def _get_public_site_base_url(self):
+        """Public marketing site origin for canonical blog links (LLM / SERP-style API)."""
+        param = self.env['ir.config_parameter'].sudo().get_param('bbweb.public_site_url')
+        base = (param or '').strip() or self._get_base_url()
+        return base.rstrip('/')
+
+    def _get_public_blog_url(self):
+        return '%s/blog/%s' % (self._get_public_site_base_url(), self.slug)
+
+    @api.model
+    def _plain_snippet(self, text, max_len=320):
+        if not text:
+            return ''
+        text = ' '.join(text.split())
+        if len(text) <= max_len:
+            return text
+        return text[: max_len - 1].rstrip() + '…'
+
+    @api.model
+    def _post_plain_body(self, post):
+        if not post.content:
+            return ''
+        try:
+            return html2plaintext(post.content, include_references=False)
+        except Exception:
+            return ''
+
+    @api.model
+    def _serp_relevance_key(self, post, q_lower):
+        """Lower tier = higher relevance when filtering by q."""
+        if not q_lower:
+            return (0, -(post.publish_date or fields.Date.today()).toordinal(), -post.id)
+        title = (post.title or '').lower()
+        excerpt = (post.excerpt or '').lower()
+        body = self._post_plain_body(post).lower()
+        if title.startswith(q_lower):
+            tier = 0
+        elif q_lower in title:
+            tier = 1
+        elif q_lower in excerpt:
+            tier = 2
+        elif q_lower in body:
+            tier = 3
+        else:
+            tier = 4
+        return (tier, -(post.publish_date or fields.Date.today()).toordinal(), -post.id)
+
+    @api.model
+    def get_serp_search(
+        self,
+        q=None,
+        category=None,
+        category_code=None,
+        tag=None,
+        slug=None,
+        since=None,
+        until=None,
+        featured_only=False,
+        page=1,
+        limit=20,
+        include_body=False,
+        max_snippet_len=320,
+        max_body_len=12000,
+    ):
+        """
+        Serp-style JSON for integrations / LLMs: metadata + organic_results (plain snippets).
+
+        :param q: Search substring for title, excerpt, HTML body (ilike).
+        :param since/until: publish_date bounds (YYYY-MM-DD strings).
+        """
+        Blog = self.sudo()
+        domain = [('active', '=', True)]
+
+        if slug and str(slug).strip():
+            domain.append(('slug', '=', str(slug).strip()))
+
+        if featured_only:
+            domain.append(('featured', '=', True))
+
+        if category_code and str(category_code).strip():
+            cat = Blog.env['bbweb.blog.category'].search(
+                [('code', '=', str(category_code).strip()), ('active', '=', True)],
+                limit=1,
+            )
+            if cat:
+                domain.append(('category_id', '=', cat.id))
+            else:
+                domain.append(('id', '=', 0))
+
+        if category and str(category).strip():
+            cat = Blog.env['bbweb.blog.category'].resolve_from_api_filter(str(category).strip())
+            if cat:
+                domain.append(('category_id', '=', cat.id))
+            else:
+                domain.append(('id', '=', 0))
+
+        if tag and str(tag).strip():
+            tag_rec = Blog.env['bbweb.blog.tag'].sudo().search(
+                [('name', '=ilike', str(tag).strip())],
+                limit=1,
+            )
+            if tag_rec:
+                domain.append(('tag_ids', 'in', [tag_rec.id]))
+            else:
+                domain.append(('id', '=', 0))
+
+        def _parse_date(label, value):
+            if value is None or value == '':
+                return None
+            s = str(value).strip()
+            if not s:
+                return None
+            try:
+                return fields.Date.from_string(s[:10])
+            except ValueError:
+                raise ValidationError(_('Invalid date for %(label)s: %(value)s') % {'label': label, 'value': value})
+
+        d_since = _parse_date('since', since)
+        d_until = _parse_date('until', until)
+        if d_since:
+            domain.append(('publish_date', '>=', d_since))
+        if d_until:
+            domain.append(('publish_date', '<=', d_until))
+
+        q_strip = (q or '').strip()
+        q_lower = q_strip.lower()
+        if q_strip:
+            pat = '%%%s%%' % q_strip.replace('\\', '\\\\').replace('%', r'\%').replace('_', r'\_')
+            domain = [
+                '|', '|',
+                ('title', 'ilike', pat),
+                ('excerpt', 'ilike', pat),
+                ('content', 'ilike', pat),
+            ] + domain
+
+        total = Blog.search_count(domain)
+        offset = (page - 1) * limit
+        posts = Blog.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
+
+        if q_strip:
+            posts = posts.sorted(key=lambda p: Blog._serp_relevance_key(p, q_lower))
+        offset = (page - 1) * limit
+        posts = Blog.search(domain, order='publish_date desc, id desc', limit=limit, offset=offset)
+
+        if q_strip:
+            posts = posts.sorted(key=lambda p: Blog._serp_relevance_key(p, q_lower))
+
+        processed_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+        organic = []
+        for idx, post in enumerate(posts, start=1):
+            pos = offset + idx
+            excerpt_plain = ' '.join((post.excerpt or '').split())
+            snippet = Blog._plain_snippet(excerpt_plain, max_snippet_len)
+            row = {
+                'position': pos,
+                'title': post.title or '',
+                'link': post._get_public_blog_url(),
+                'snippet': snippet,
+                'blog_id': post.id,
+                'slug': post.slug,
+                'category': post.category_id.name if post.category_id else '',
+                'category_code': post.category_id.code if post.category_id else '',
+                'published_date': post.publish_date.strftime('%Y-%m-%d') if post.publish_date else '',
+                'author_name': post.author_name or '',
+                'tags': [t.name for t in post.tag_ids],
+                'featured': post.featured,
+                'api_detail_url': '%s/api/bbweb/blogs/%s' % (Blog._get_base_url(), post.id),
+                'api_slug_url': '%s/api/bbweb/blogs/slug/%s' % (Blog._get_base_url(), post.slug),
+            }
+            if include_body:
+                body = Blog._post_plain_body(post)
+                row['content_text'] = body[:max_body_len] + ('…' if len(body) > max_body_len else '')
+            organic.append(row)
+
+        return {
+            'search_metadata': {
+                'status': 'Success',
+                'engine': 'bbweb_blog',
+                'q': q_strip,
+                'total_results': total,
+                'page': page,
+                'limit': limit,
+                'has_more': offset + len(posts) < total,
+                'processed_at': processed_at,
+                'include_body': include_body,
+            },
+            'organic_results': organic,
+        }
     
     def _process_html_content(self, html_content):
         """

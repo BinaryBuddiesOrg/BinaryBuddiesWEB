@@ -486,6 +486,78 @@ The API logs the following:
 
 ---
 
+## Blog search API (SERP-style, LLM-friendly)
+
+`GET /api/bbweb/blogs/search` returns a **stable JSON envelope** similar in spirit to search-engine result APIs: `search_metadata` plus `organic_results`. Each result includes a **plain-text `snippet`** (from the excerpt) and optional stripped **`content_text`** for retrieval workflows.
+
+### Query parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `q` | Substring search over **title**, **excerpt**, and **HTML body** (case-insensitive). |
+| `category` | Category label or code (same resolution as `GET /api/bbweb/blogs?category=...`). Unknown → no results. |
+| `category_code` | Exact active category **code** (e.g. `development`). Unknown → no results. |
+| `tag` | Tag name (case-insensitive). Unknown → no results. |
+| `slug` | Exact post slug. |
+| `since` / `until` | Filter `publish_date` (`YYYY-MM-DD`). Invalid dates → `400`. |
+| `featured` | `1` / `true` to restrict to featured posts. |
+| `page` | Page number (default `1`, minimum `1`). |
+| `limit` | Page size (default `20`, max `50`). |
+| `include_body` | `1` / `true` to add `content_text` (HTML → plain text, capped at 12000 characters). |
+
+### Canonical URLs (`link`)
+
+Each hit includes **`link`**: `{public_origin}/blog/{slug}`.
+
+- **`bbweb.public_site_url`** in *Settings → Technical → Parameters → System Parameters* overrides the origin when set (e.g. `https://binarybuddies.com`).
+- Otherwise **`web.base.url`** is used (Odoo base URL).
+
+### Example
+
+```bash
+curl -s "http://localhost:8069/api/bbweb/blogs/search?q=automation&limit=5"
+```
+
+Minimal response shape:
+
+```json
+{
+  "search_metadata": {
+    "status": "Success",
+    "engine": "bbweb_blog",
+    "q": "automation",
+    "total_results": 3,
+    "page": 1,
+    "limit": 5,
+    "has_more": false,
+    "processed_at": "2026-05-06T12:00:00Z",
+    "include_body": false
+  },
+  "organic_results": [
+    {
+      "position": 1,
+      "title": "...",
+      "link": "https://example.com/blog/my-post",
+      "snippet": "Plain excerpt text…",
+      "blog_id": 1,
+      "slug": "my-post",
+      "category": "Automation",
+      "category_code": "automation",
+      "published_date": "2026-01-15",
+      "author_name": "...",
+      "tags": ["RPA"],
+      "featured": false,
+      "api_detail_url": "http://localhost:8069/api/bbweb/blogs/1",
+      "api_slug_url": "http://localhost:8069/api/bbweb/blogs/slug/my-post"
+    }
+  ]
+}
+```
+
+Use **`snippet`** for short LLM context; call **`api_slug_url`** or **`api_detail_url`** when full HTML is required.
+
+---
+
 ## Next Steps
 
 1. ✅ Generate and configure API key

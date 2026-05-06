@@ -26,6 +26,7 @@ API Endpoints:
 * /api/bbweb/team - Team members
 * /api/bbweb/blogs - Blog posts
 * /api/bbweb/blogs/categories - Blog categories (dynamic list)
+* /api/bbweb/blogs/search - Serp-style blog search JSON (LLM / integrations)
 * /api/bbweb/careers - Career listings
 
 All endpoints are publicly accessible and return JSON data.
